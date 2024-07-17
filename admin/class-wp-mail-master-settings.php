@@ -16,6 +16,7 @@ class WP_Mail_Master_Settings {
             'smtp' => 'SMTP',
             'brevo' => 'Brevo API',
             'sendgrid' => 'SendGrid API',
+            'smtpcom' => 'SMTP.com'
         );
 
         add_action('admin_init', array($this, 'register_settings'));
@@ -58,6 +59,7 @@ class WP_Mail_Master_Settings {
         $this->add_smtp_settings();
         $this->add_brevo_settings();
         $this->add_sendgrid_settings();
+        $this->add_smtpcom_settings();
     }
 
     public function wp_mail_master_general_section_callback() {
@@ -95,6 +97,7 @@ class WP_Mail_Master_Settings {
         echo '<input type="text" name="wp_mail_master_options[from_name]" value="' . esc_attr($options['from_name']) . '" />';
     }
 
+    // SMTP
     private function add_smtp_settings() {
         add_settings_section(
             'wp_mail_master_smtp_section',
@@ -147,6 +150,7 @@ class WP_Mail_Master_Settings {
         }
     }
 
+    // Brevo
     private function add_brevo_settings() {
         add_settings_section(
             'wp_mail_master_brevo_section',
@@ -174,6 +178,7 @@ class WP_Mail_Master_Settings {
         echo '<input type="text" name="wp_mail_master_options[brevo_api_key]" value="' . esc_attr($api_key) . '" />';
     }
 
+    // SendGrid 
     private function add_sendgrid_settings() {
         add_settings_section(
             'wp_mail_master_sendgrid_section',
@@ -199,5 +204,95 @@ class WP_Mail_Master_Settings {
         $options = get_option('wp_mail_master_options');
         $api_key = isset($options['sendgrid_api_key']) ? $options['sendgrid_api_key'] : '';
         echo '<input type="text" name="wp_mail_master_options[sendgrid_api_key]" value="' . esc_attr($api_key) . '" />';
+    }
+
+    // SMTP.COM
+    private function add_smtpcom_settings() {
+        add_settings_section(
+            'wp_mail_master_smtpcom_section',
+            __('SMTP.com Settings', 'wp-mail-master'),
+            array($this, 'wp_mail_master_smtpcom_section_callback'),
+            'wp_mail_master_smtpcom_section'
+        );
+
+        add_settings_field(
+            'wp_mail_master_smtpcom_username',
+            __('SMTP.com Username', 'wp-mail-master'),
+            array($this, 'wp_mail_master_smtpcom_username_callback'),
+            'wp_mail_master_smtpcom_section',
+            'wp_mail_master_smtpcom_section'
+        );
+
+        add_settings_field(
+            'wp_mail_master_smtpcom_password',
+            __('SMTP.com Password', 'wp-mail-master'),
+            array($this, 'wp_mail_master_smtpcom_password_callback'),
+            'wp_mail_master_smtpcom_section',
+            'wp_mail_master_smtpcom_section'
+        );
+
+        add_settings_field(
+            'wp_mail_master_smtpcom_host',
+            __('SMTP.com Host', 'wp-mail-master'),
+            array($this, 'wp_mail_master_smtpcom_host_callback'),
+            'wp_mail_master_smtpcom_section',
+            'wp_mail_master_smtpcom_section'
+        );
+
+        add_settings_field(
+            'wp_mail_master_smtpcom_port',
+            __('SMTP.com Port', 'wp-mail-master'),
+            array($this, 'wp_mail_master_smtpcom_port_callback'),
+            'wp_mail_master_smtpcom_section',
+            'wp_mail_master_smtpcom_section'
+        );
+
+        add_settings_field(
+            'wp_mail_master_smtpcom_encryption',
+            __('SMTP.com Encryption', 'wp-mail-master'),
+            array($this, 'wp_mail_master_smtpcom_encryption_callback'),
+            'wp_mail_master_smtpcom_section',
+            'wp_mail_master_smtpcom_section'
+        );
+    }
+
+    public function wp_mail_master_smtpcom_section_callback() {
+        echo '<p>' . __('Enter your SMTP.com settings below:', 'wp-mail-master') . '</p>';
+    }
+
+    public function wp_mail_master_smtpcom_username_callback() {
+        $options = get_option('wp_mail_master_options');
+        $username = isset($options['smtpcom_username']) ? $options['smtpcom_username'] : '';
+        echo '<input type="text" name="wp_mail_master_options[smtpcom_username]" value="' . esc_attr($username) . '" />';
+    }
+
+    public function wp_mail_master_smtpcom_password_callback() {
+        $options = get_option('wp_mail_master_options');
+        $password = isset($options['smtpcom_password']) ? $options['smtpcom_password'] : '';
+        echo '<input type="password" name="wp_mail_master_options[smtpcom_password]" value="' . esc_attr($password) . '" />';
+    }
+
+    public function wp_mail_master_smtpcom_host_callback() {
+        $options = get_option('wp_mail_master_options');
+        $host = isset($options['smtpcom_host']) ? $options['smtpcom_host'] : '';
+        echo '<input type="text" name="wp_mail_master_options[smtpcom_host]" value="' . esc_attr($host) . '" />';
+    }
+
+    public function wp_mail_master_smtpcom_port_callback() {
+        $options = get_option('wp_mail_master_options');
+        $port = isset($options['smtpcom_port']) ? $options['smtpcom_port'] : '';
+        echo '<input type="text" name="wp_mail_master_options[smtpcom_port]" value="' . esc_attr($port) . '" />';
+    }
+
+    public function wp_mail_master_smtpcom_encryption_callback() {
+        $options = get_option('wp_mail_master_options');
+        $encryption = isset($options['smtpcom_encryption']) ? $options['smtpcom_encryption'] : '';
+        ?>
+        <select name="wp_mail_master_options[smtpcom_encryption]">
+            <option value="none" <?php selected($encryption, 'none'); ?>>None</option>
+            <option value="ssl" <?php selected($encryption, 'ssl'); ?>>SSL</option>
+            <option value="tls" <?php selected($encryption, 'tls'); ?>>TLS</option>
+        </select>
+        <?php
     }
 }

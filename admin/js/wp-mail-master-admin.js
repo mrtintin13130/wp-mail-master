@@ -2,7 +2,7 @@ jQuery(document).ready(function ($) {
   function toggleServiceSettings() {
     var selectedService = $('input[name="wp_mail_master_options[email_service]"]:checked').val();
     console.log("Selected service:", selectedService); // For debugging
-    $(".wp_mail_master_smtp_section, .wp_mail_master_brevo_section, .wp_mail_master_sendgrid_section").hide();
+    $(".wp_mail_master_smtp_section, .wp_mail_master_brevo_section, .wp_mail_master_sendgrid_section, .wp_mail_master_smtpcom_section").hide();
     $(".wp_mail_master_" + selectedService + "_section").show();
   }
 

@@ -27,6 +27,11 @@
         echo '<div class="wp_mail_master_sendgrid_section">';
         do_settings_sections('wp_mail_master_sendgrid_section');
         echo '</div>';
+        
+        // SMTP.com Settings Section
+        echo '<div class="wp_mail_master_smtpcom_section">';
+        do_settings_sections('wp_mail_master_smtpcom_section');
+        echo '</div>';
 
         submit_button('Save Settings');
         ?>

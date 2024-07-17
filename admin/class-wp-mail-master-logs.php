@@ -38,7 +38,7 @@ class WP_Mail_Master_Logs
                         <th><?php echo esc_html__('Time', 'wp-mail-master'); ?></th>
                         <th><?php echo esc_html__('To', 'wp-mail-master'); ?></th>
                         <th><?php echo esc_html__('Subject', 'wp-mail-master'); ?></th>
-                        <th><?php echo esc_html__('Message', 'wp-mail-master'); ?></th>
+                        <!-- <th><?php echo esc_html__('Message', 'wp-mail-master'); ?></th> -->
                         <th><?php echo esc_html__('Status', 'wp-mail-master'); ?></th>
                         <th><?php echo esc_html__('Error Info', 'wp-mail-master'); ?></th>
                         <th><?php echo esc_html__('Action', 'wp-mail-master'); ?></th>
@@ -47,10 +47,10 @@ class WP_Mail_Master_Logs
                 <tbody>
                     <?php foreach ($logs as $log): ?>
                         <tr>
-                            <td><?php echo esc_html($log->time); ?></td>
+                            <td><?php echo esc_html(date_i18n('d/m/Y - H:i:s', strtotime($log->time))); ?></td>
                             <td><?php echo esc_html($log->to_email); ?></td>
                             <td><?php echo esc_html($log->subject); ?></td>
-                            <td><?php echo esc_html(substr($log->message, 0, 100)); ?>...</td>
+                            <!-- <td><?php echo esc_html(substr($log->message, 0, 100)); ?>...</td> -->
                             <td><?php echo esc_html($log->status); ?></td>
                             <td><?php echo esc_html(substr($log->error_info, 0, 100)); ?>...</td>
                             <td>
@@ -81,7 +81,7 @@ class WP_Mail_Master_Logs
             <table class="form-table">
                 <tr>
                     <th><?php echo esc_html__('Time', 'wp-mail-master'); ?></th>
-                    <td><?php echo esc_html($log->time); ?></td>
+                    <td><?php echo esc_html(date_i18n('d/m/Y - H:i:s', strtotime($log->time))); ?></td>
                 </tr>
                 <tr>
                     <th><?php echo esc_html__('To', 'wp-mail-master'); ?></th>

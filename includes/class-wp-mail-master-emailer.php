@@ -32,6 +32,8 @@ class WP_Mail_Master_Emailer
             return $this->send_via_brevo($to, $subject, $html_template, $headers, $attachments);
         } elseif ($email_service === 'sendgrid') {
             return $this->send_via_sendgrid($to, $subject, $html_template, $headers, $attachments);
+        } elseif ($email_service === 'smtpcom') {
+            return $this->send_via_smtpcom($to, $subject, $html_template, $headers, $attachments);
         } else {
             return false;
         }
@@ -148,6 +150,48 @@ class WP_Mail_Master_Emailer
             }
         } catch (Exception $e) {
             $error_message = 'SendGrid Exception: ' . $e->getMessage();
+            $this->log_email($to, $subject, $html_template, 'error', $error_message);
+            error_log($error_message);
+            return false;
+        }
+    }
+
+    private function send_via_smtpcom($to, $subject, $html_template, $headers, $attachments)
+    {
+        $options = get_option('wp_mail_master_options');
+        $mail = new PHPMailer(true);
+
+        try {
+            // Server settings
+            $mail->isSMTP();
+            $mail->Host = $options['smtpcom_host'];
+            $mail->SMTPAuth = true;
+            $mail->Username = $options['smtpcom_username'];
+            $mail->Password = $options['smtpcom_password'];
+            $mail->SMTPSecure = $options['smtpcom_encryption'];
+            $mail->Port = $options['smtpcom_port'];
+
+            // Recipients
+            $mail->setFrom($options['from_email'], $options['from_name']);
+            $mail->addAddress($to);
+
+            // Attachments
+            if (!empty($attachments)) {
+                foreach ($attachments as $attachment) {
+                    $mail->addAttachment($attachment);
+                }
+            }
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $html_template;
+
+            $mail->send();
+            $this->log_email($to, $subject, $html_template, 'success');
+            return true;
+        } catch (Exception $e) {
+            $error_message = 'Mailer Error: ' . $mail->ErrorInfo;
             $this->log_email($to, $subject, $html_template, 'error', $error_message);
             error_log($error_message);
             return false;
