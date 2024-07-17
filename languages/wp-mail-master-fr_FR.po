@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP Mail Master 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-mail-master\n"
-"POT-Creation-Date: 2024-07-17T14:55:38+00:00\n"
-"PO-Revision-Date: 2024-07-17 16:56+0200\n"
+"POT-Creation-Date: 2024-07-17T14:59:01+00:00\n"
+"PO-Revision-Date: 2024-07-17 16:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -226,6 +226,10 @@ msgstr "Saisissez vos paramètres Mailjet ci-dessous :"
 #: admin/partials/wp-mail-master-admin-display.php:47
 msgid "Send Test Email"
 msgstr "Envoyer un e-mail de test"
+
+#: admin/partials/wp-mail-master-admin-display.php:41
+msgid "Save Settings"
+msgstr "Enregistrer"
 
 #: admin/partials/wp-mail-master-admin-display.php:54
 msgid "Send Email"

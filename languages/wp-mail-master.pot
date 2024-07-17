@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-07-17T14:55:38+00:00\n"
+"POT-Creation-Date: 2024-07-17T14:59:01+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wp-mail-master\n"
@@ -220,6 +220,10 @@ msgstr ""
 #: admin/partials/wp-mail-master-admin-display.php:7
 #: admin/partials/wp-mail-master-admin-display.php:47
 msgid "Send Test Email"
+msgstr ""
+
+#: admin/partials/wp-mail-master-admin-display.php:41
+msgid "Save Settings"
 msgstr ""
 
 #: admin/partials/wp-mail-master-admin-display.php:54

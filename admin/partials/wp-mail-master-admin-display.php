@@ -38,7 +38,7 @@
         do_settings_sections('wp_mail_master_mailjet_section');
         echo '</div>';
 
-        submit_button('Save Settings');
+        submit_button(__('Save Settings', 'wp-mail-master'));
         ?>
     </form>
 
