@@ -43,6 +43,8 @@
             <button type="button" id="send-test-email-button"
                 class="button button-primary"><?php _e('Send Test Email', 'wp-mail-master'); ?></button>
         </form>
-        <div id="test-email-result"></div>
+        <div id="test-email-result">
+            <div id="spinner" style="display:none;"></div>
+        </div>
     </div>
 </div>
