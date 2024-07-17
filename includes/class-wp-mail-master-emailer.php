@@ -13,6 +13,8 @@ use Brevo\Client\Model\SendSmtpEmailSender;
 use Brevo\Client\Model\SendSmtpEmailTo;
 use SendGrid;
 use SendGrid\Mail\Mail;
+use Mailjet\Client;
+use Mailjet\Resources;
 
 class WP_Mail_Master_Emailer
 {
@@ -34,6 +36,8 @@ class WP_Mail_Master_Emailer
             return $this->send_via_sendgrid($to, $subject, $html_template, $headers, $attachments);
         } elseif ($email_service === 'smtpcom') {
             return $this->send_via_smtpcom($to, $subject, $html_template, $headers, $attachments);
+        } elseif ($email_service === 'mailjet') {
+            return $this->send_via_mailjet($to, $subject, $html_template, $headers, $attachments);
         } else {
             return false;
         }
@@ -192,6 +196,59 @@ class WP_Mail_Master_Emailer
             return true;
         } catch (Exception $e) {
             $error_message = 'Mailer Error: ' . $mail->ErrorInfo;
+            $this->log_email($to, $subject, $html_template, 'error', $error_message);
+            error_log($error_message);
+            return false;
+        }
+    }
+
+    private function send_via_mailjet($to, $subject, $html_template, $headers, $attachments)
+    {
+        $options = get_option('wp_mail_master_options');
+        $api_key = isset($options['mailjet_api_key']) ? $options['mailjet_api_key'] : '';
+        $secret_key = isset($options['mailjet_secret_key']) ? $options['mailjet_secret_key'] : '';
+
+        if (empty($api_key) || empty($secret_key)) {
+            $error_message = 'Mailjet API key or secret key is missing.';
+            $this->log_email($to, $subject, $html_template, 'error', $error_message);
+            error_log($error_message);
+            return false;
+        }
+
+        $mj = new Client($api_key, $secret_key, true, ['version' => 'v3.1']);
+        $body = [
+            'Messages' => [
+                [
+                    'From' => [
+                        'Email' => $options['from_email'],
+                        'Name' => $options['from_name']
+                    ],
+                    'To' => [
+                        [
+                            'Email' => $to,
+                            'Name' => $to
+                        ]
+                    ],
+                    'Subject' => $subject,
+                    'HTMLPart' => $html_template
+                ]
+            ]
+        ];
+
+        try {
+            $response = $mj->post(Resources::$Email, ['body' => $body]);
+            if ($response->success()) {
+                $this->log_email($to, $subject, $html_template, 'success');
+                return true;
+            } else {
+                $error_message = 'Mailjet API Error: ' . $response->getReasonPhrase();
+                $error_info = 'Response: ' . json_encode($response->getBody());
+                $this->log_email($to, $subject, $html_template, 'error', $error_info);
+                error_log($error_message);
+                return false;
+            }
+        } catch (Exception $e) {
+            $error_message = 'Mailjet API Error: ' . $e->getMessage();
             $this->log_email($to, $subject, $html_template, 'error', $error_message);
             error_log($error_message);
             return false;

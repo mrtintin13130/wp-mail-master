@@ -16,7 +16,8 @@ class WP_Mail_Master_Settings {
             'smtp' => 'SMTP',
             'brevo' => 'Brevo API',
             'sendgrid' => 'SendGrid API',
-            'smtpcom' => 'SMTP.com'
+            'smtpcom' => 'SMTP.com',
+            'mailjet' => 'Mailjet',
         );
 
         add_action('admin_init', array($this, 'register_settings'));
@@ -60,6 +61,7 @@ class WP_Mail_Master_Settings {
         $this->add_brevo_settings();
         $this->add_sendgrid_settings();
         $this->add_smtpcom_settings();
+        $this->add_mailjet_settings();
     }
 
     public function wp_mail_master_general_section_callback() {
@@ -294,5 +296,47 @@ class WP_Mail_Master_Settings {
             <option value="tls" <?php selected($encryption, 'tls'); ?>>TLS</option>
         </select>
         <?php
+    }
+
+    // Mailjet
+    private function add_mailjet_settings() {
+        add_settings_section(
+            'wp_mail_master_mailjet_section',
+            __('Mailjet Settings', 'wp-mail-master'),
+            array($this, 'wp_mail_master_mailjet_section_callback'),
+            'wp_mail_master_mailjet_section'
+        );
+
+        add_settings_field(
+            'wp_mail_master_mailjet_api_key',
+            __('Mailjet API Key', 'wp-mail-master'),
+            array($this, 'wp_mail_master_mailjet_api_key_callback'),
+            'wp_mail_master_mailjet_section',
+            'wp_mail_master_mailjet_section'
+        );
+
+        add_settings_field(
+            'wp_mail_master_mailjet_secret_key',
+            __('Mailjet Secret Key', 'wp-mail-master'),
+            array($this, 'wp_mail_master_mailjet_secret_key_callback'),
+            'wp_mail_master_mailjet_section',
+            'wp_mail_master_mailjet_section'
+        );
+    }
+
+    public function wp_mail_master_mailjet_section_callback() {
+        echo '<p>' . __('Enter your Mailjet settings below:', 'wp-mail-master') . '</p>';
+    }
+
+    public function wp_mail_master_mailjet_api_key_callback() {
+        $options = get_option('wp_mail_master_options');
+        $api_key = isset($options['mailjet_api_key']) ? $options['mailjet_api_key'] : '';
+        echo '<input type="text" name="wp_mail_master_options[mailjet_api_key]" value="' . esc_attr($api_key) . '" />';
+    }
+
+    public function wp_mail_master_mailjet_secret_key_callback() {
+        $options = get_option('wp_mail_master_options');
+        $secret_key = isset($options['mailjet_secret_key']) ? $options['mailjet_secret_key'] : '';
+        echo '<input type="text" name="wp_mail_master_options[mailjet_secret_key]" value="' . esc_attr($secret_key) . '" />';
     }
 }

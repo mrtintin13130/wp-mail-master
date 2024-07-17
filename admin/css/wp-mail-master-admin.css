@@ -30,10 +30,15 @@
 }
 .email-service-icon {
     margin-bottom: 10px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 .email-service-icon img {
     max-width: 100px;
-    height: 80px;
+    max-height: 80px;
 }
 .email-service-label {
     font-weight: bold;

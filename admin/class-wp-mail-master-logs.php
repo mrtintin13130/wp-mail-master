@@ -52,7 +52,7 @@ class WP_Mail_Master_Logs
                             <td><?php echo esc_html($log->subject); ?></td>
                             <!-- <td><?php echo esc_html(substr($log->message, 0, 100)); ?>...</td> -->
                             <td><?php echo esc_html($log->status); ?></td>
-                            <td><?php echo esc_html(substr($log->error_info, 0, 100)); ?>...</td>
+                            <td><?php echo esc_html(substr($log->error_info ?? '...', 0, 100)); ?></td>
                             <td>
                                 <a
                                     href="<?php echo esc_url(add_query_arg('log_id', $log->id, admin_url('admin.php?page=wp-mail-master-email-logs'))); ?>">

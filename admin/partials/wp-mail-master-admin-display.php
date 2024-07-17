@@ -32,6 +32,11 @@
         echo '<div class="wp_mail_master_smtpcom_section">';
         do_settings_sections('wp_mail_master_smtpcom_section');
         echo '</div>';
+        
+        // Mailjet Settings Section
+        echo '<div class="wp_mail_master_mailjet_section">';
+        do_settings_sections('wp_mail_master_mailjet_section');
+        echo '</div>';
 
         submit_button('Save Settings');
         ?>
