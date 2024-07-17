@@ -178,7 +178,7 @@ class WP_Mail_Master_Emailer
                                     <tr>
                                         <td style="color: #777777; font-family: Arial, sans-serif; font-size: 14px;" width="75%">
                                             &copy; ' . date('Y') . ' WP Mail Master. All rights reserved.<br/>
-                                            <a href="https://example.com" style="color: #0073aa; text-decoration: none;">Visit our website</a>
+                                            <a href="' . site_url() . '" style="color: #0073aa; text-decoration: none;">Visit our website</a>
                                         </td>
                                     </tr>
                                 </table>
