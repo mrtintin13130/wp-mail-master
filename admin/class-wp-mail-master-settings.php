@@ -14,7 +14,8 @@ class WP_Mail_Master_Settings {
         $this->version = $version;
         $this->email_services = array(
             'smtp' => 'SMTP',
-            'brevo' => 'Brevo API'
+            'brevo' => 'Brevo API',
+            'sendgrid' => 'SendGrid API',
         );
 
         add_action('admin_init', array($this, 'register_settings'));
@@ -56,6 +57,7 @@ class WP_Mail_Master_Settings {
 
         $this->add_smtp_settings();
         $this->add_brevo_settings();
+        $this->add_sendgrid_settings();
     }
 
     public function wp_mail_master_general_section_callback() {
@@ -170,5 +172,32 @@ class WP_Mail_Master_Settings {
         $options = get_option('wp_mail_master_options');
         $api_key = isset($options['brevo_api_key']) ? $options['brevo_api_key'] : '';
         echo '<input type="text" name="wp_mail_master_options[brevo_api_key]" value="' . esc_attr($api_key) . '" />';
+    }
+
+    private function add_sendgrid_settings() {
+        add_settings_section(
+            'wp_mail_master_sendgrid_section',
+            __('SendGrid Settings', 'wp-mail-master'),
+            array($this, 'wp_mail_master_sendgrid_section_callback'),
+            'wp_mail_master_sendgrid_section'
+        );
+
+        add_settings_field(
+            'wp_mail_master_sendgrid_api_key',
+            __('SendGrid API Key', 'wp-mail-master'),
+            array($this, 'wp_mail_master_sendgrid_api_key_callback'),
+            'wp_mail_master_sendgrid_section',
+            'wp_mail_master_sendgrid_section'
+        );
+    }
+
+    public function wp_mail_master_sendgrid_section_callback() {
+        echo '<p>' . __('Enter your SendGrid API settings below:', 'wp-mail-master') . '</p>';
+    }
+
+    public function wp_mail_master_sendgrid_api_key_callback() {
+        $options = get_option('wp_mail_master_options');
+        $api_key = isset($options['sendgrid_api_key']) ? $options['sendgrid_api_key'] : '';
+        echo '<input type="text" name="wp_mail_master_options[sendgrid_api_key]" value="' . esc_attr($api_key) . '" />';
     }
 }

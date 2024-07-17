@@ -2,7 +2,8 @@
     "name": "martho/wp-mail-master",
     "require": {
         "phpmailer/phpmailer": "^6.9",
-        "getbrevo/brevo-php": "^2.0"
+        "getbrevo/brevo-php": "^2.0",
+        "sendgrid/sendgrid": "~7"
     },
     "autoload": {
         "psr-4": {

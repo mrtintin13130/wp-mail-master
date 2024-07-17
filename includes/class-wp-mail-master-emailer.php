@@ -11,12 +11,14 @@ use Brevo\Client\Configuration;
 use Brevo\Client\Model\SendSmtpEmail;
 use Brevo\Client\Model\SendSmtpEmailSender;
 use Brevo\Client\Model\SendSmtpEmailTo;
+use SendGrid;
+use SendGrid\Mail\Mail;
 
 class WP_Mail_Master_Emailer
 {
     public function send_email($to, $subject, $message, $headers = '', $attachments = array())
     {
-        error_log("send_email called: to=$to, subject=$subject"); // Debug log
+        // error_log("send_email called: to=$to, subject=$subject"); // Debug log
 
         $options = get_option('wp_mail_master_options');
         $email_service = isset($options['email_service']) ? $options['email_service'] : 'smtp';
@@ -28,6 +30,8 @@ class WP_Mail_Master_Emailer
             return $this->send_via_smtp($to, $subject, $html_template, $headers, $attachments);
         } elseif ($email_service === 'brevo') {
             return $this->send_via_brevo($to, $subject, $html_template, $headers, $attachments);
+        } elseif ($email_service === 'sendgrid') {
+            return $this->send_via_sendgrid($to, $subject, $html_template, $headers, $attachments);
         } else {
             return false;
         }
@@ -107,6 +111,44 @@ class WP_Mail_Master_Emailer
             $error_message = 'Brevo API Error: ' . $e->getMessage();
             $error_info = 'Response: ' . json_encode($response_body);
             $this->log_email($to, $subject, $html_template, 'error', $error_info);
+            error_log($error_message);
+            return false;
+        }
+    }
+
+    private function send_via_sendgrid($to, $subject, $html_template, $headers, $attachments)
+    {
+        $options = get_option('wp_mail_master_options');
+        $api_key = isset($options['sendgrid_api_key']) ? $options['sendgrid_api_key'] : '';
+
+        if (empty($api_key)) {
+            $error_message = 'SendGrid API key is missing.';
+            $this->log_email($to, $subject, $html_template, 'error', $error_message);
+            error_log($error_message);
+            return false;
+        }
+
+        $email = new Mail();
+        $email->setFrom($options['from_email'], $options['from_name']);
+        $email->setSubject($subject);
+        $email->addTo($to);
+        $email->addContent("text/html", $html_template);
+
+        try {
+            $sendgrid = new SendGrid($api_key);
+            $response = $sendgrid->send($email);
+            if ($response->statusCode() >= 200 && $response->statusCode() < 300) {
+                $this->log_email($to, $subject, $html_template, 'success');
+                return true;
+            } else {
+                $error_message = 'SendGrid API Error: ' . $response->statusCode() . ' - ' . $response->body();
+                $this->log_email($to, $subject, $html_template, 'error', $error_message);
+                error_log($error_message);
+                return false;
+            }
+        } catch (Exception $e) {
+            $error_message = 'SendGrid Exception: ' . $e->getMessage();
+            $this->log_email($to, $subject, $html_template, 'error', $error_message);
             error_log($error_message);
             return false;
         }

@@ -22,6 +22,11 @@
         echo '<div class="wp_mail_master_brevo_section">';
         do_settings_sections('wp_mail_master_brevo_section');
         echo '</div>';
+        
+        // Sendgrid Settings Section
+        echo '<div class="wp_mail_master_sendgrid_section">';
+        do_settings_sections('wp_mail_master_sendgrid_section');
+        echo '</div>';
 
         submit_button('Save Settings');
         ?>
