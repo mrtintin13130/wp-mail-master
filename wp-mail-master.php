@@ -8,6 +8,7 @@
  * Author URI: https://example.com
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+ * Requires PHP: 8.1
  * Text Domain: wp-mail-master
  * Domain Path: /languages
  */
