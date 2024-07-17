@@ -51,7 +51,7 @@
             <input type="email" id="test-email-address" name="test_email_address"
                 value="<?php echo esc_attr(get_option('admin_email')); ?>" required />
             <button type="button" id="send-test-email-button"
-                class="button button-primary"><?php _e('Send Test Email', 'wp-mail-master'); ?></button>
+                class="button button-primary"><?php _e('Send Email', 'wp-mail-master'); ?></button>
         </form>
         <div id="test-email-result">
             <div id="spinner" style="display:none;"></div>

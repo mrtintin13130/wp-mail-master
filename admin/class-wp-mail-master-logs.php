@@ -16,17 +16,23 @@ class WP_Mail_Master_Logs
 
         $table_name = $wpdb->prefix . 'wp_mail_master_logs';
 
-        $log_id = isset($_GET['log_id']) ? intval($_GET['log_id']) : 0;
+        // Number of items per page
+        $per_page = 10;
 
-        if ($log_id > 0) {
-            $log = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $log_id));
-            if ($log) {
-                $this->display_single_log($log);
-                return;
-            }
-        }
+        // Get the current page
+        $current_page = isset($_GET['paged']) ? intval($_GET['paged']) : 1;
 
-        $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY time DESC");
+        // Calculate the offset
+        $offset = ($current_page - 1) * $per_page;
+
+        // Get the total number of items
+        $total_items = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+
+        // Fetch the logs with pagination
+        $logs = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name ORDER BY time DESC LIMIT %d OFFSET %d", $per_page, $offset));
+
+        // Set up pagination
+        $total_pages = ceil($total_items / $per_page);
 
         ob_start();
         ?>
@@ -38,7 +44,6 @@ class WP_Mail_Master_Logs
                         <th><?php echo esc_html__('Time', 'wp-mail-master'); ?></th>
                         <th><?php echo esc_html__('To', 'wp-mail-master'); ?></th>
                         <th><?php echo esc_html__('Subject', 'wp-mail-master'); ?></th>
-                        <!-- <th><?php echo esc_html__('Message', 'wp-mail-master'); ?></th> -->
                         <th><?php echo esc_html__('Status', 'wp-mail-master'); ?></th>
                         <th><?php echo esc_html__('Error Info', 'wp-mail-master'); ?></th>
                         <th><?php echo esc_html__('Action', 'wp-mail-master'); ?></th>
@@ -50,7 +55,6 @@ class WP_Mail_Master_Logs
                             <td><?php echo esc_html(date_i18n('d/m/Y - H:i:s', strtotime($log->time))); ?></td>
                             <td><?php echo esc_html($log->to_email); ?></td>
                             <td><?php echo esc_html($log->subject); ?></td>
-                            <!-- <td><?php echo esc_html(substr($log->message, 0, 100)); ?>...</td> -->
                             <td><?php echo esc_html($log->status); ?></td>
                             <td><?php echo esc_html(substr($log->error_info ?? '...', 0, 100)); ?></td>
                             <td>
@@ -63,6 +67,19 @@ class WP_Mail_Master_Logs
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            <?php
+            // Display pagination links
+            $pagination_args = array(
+                'base' => add_query_arg('paged', '%#%'),
+                'format' => '',
+                'total' => $total_pages,
+                'current' => $current_page,
+                'show_all' => false,
+                'type' => 'plain',
+            );
+
+            echo paginate_links($pagination_args);
+            ?>
         </div>
         <?php
         echo ob_get_clean();
@@ -108,5 +125,4 @@ class WP_Mail_Master_Logs
         <?php
         echo ob_get_clean();
     }
-
 }

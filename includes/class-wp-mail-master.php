@@ -17,6 +17,7 @@ class WP_Mail_Master
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
+        $this->define_email_hooks();
     }
 
     private function load_dependencies()

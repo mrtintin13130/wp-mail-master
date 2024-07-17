@@ -1,0 +1,227 @@
+# Copyright (C) 2024 Martho
+# This file is distributed under the GPL-2.0+.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Mail Master 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-mail-master\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-07-17T14:55:38+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: wp-mail-master\n"
+
+#. Plugin Name of the plugin
+msgid "WP Mail Master"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://example.com/wp-mail-master"
+msgstr ""
+
+#. Description of the plugin
+msgid "A fully featured email plugin for WordPress with API and SMTP support, email logging, and more."
+msgstr ""
+
+#. Author of the plugin
+msgid "Martho"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://example.com"
+msgstr ""
+
+#: admin/class-wp-mail-master-admin.php:57
+#: admin/class-wp-mail-master-admin.php:58
+#: admin/class-wp-mail-master-logs.php:40
+msgid "Email Logs"
+msgstr ""
+
+#: admin/class-wp-mail-master-ajax.php:15
+msgid "You are not allowed to send test emails."
+msgstr ""
+
+#: admin/class-wp-mail-master-ajax.php:26
+msgid "Invalid email address."
+msgstr ""
+
+#: admin/class-wp-mail-master-ajax.php:35
+msgid "Test email sent successfully."
+msgstr ""
+
+#: admin/class-wp-mail-master-ajax.php:37
+msgid "Failed to send test email."
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:44
+#: admin/class-wp-mail-master-logs.php:100
+msgid "Time"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:45
+#: admin/class-wp-mail-master-logs.php:104
+msgid "To"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:46
+#: admin/class-wp-mail-master-logs.php:108
+msgid "Subject"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:47
+#: admin/class-wp-mail-master-logs.php:116
+msgid "Status"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:48
+#: admin/class-wp-mail-master-logs.php:120
+msgid "Error Info"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:49
+msgid "Action"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:63
+msgid "View"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:95
+msgid "Email Log Details"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:97
+msgid "Back to logs"
+msgstr ""
+
+#: admin/class-wp-mail-master-logs.php:112
+msgid "Message"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:31
+msgid "General Settings"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:38
+msgid "Email Service"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:46
+msgid "From Email"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:54
+msgid "From Name"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:68
+msgid "Configure your email settings below:"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:106
+msgid "SMTP Settings"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:112
+msgid "SMTP Host"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:113
+msgid "SMTP Port"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:114
+msgid "SMTP Username"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:115
+msgid "SMTP Password"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:116
+msgid "Encryption"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:132
+msgid "Enter your SMTP settings below:"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:159
+msgid "Brevo API Settings"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:166
+msgid "Brevo API Key"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:174
+msgid "Enter your Brevo API settings below:"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:187
+msgid "SendGrid Settings"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:194
+msgid "SendGrid API Key"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:202
+msgid "Enter your SendGrid API settings below:"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:215
+msgid "SMTP.com Settings"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:222
+msgid "SMTP.com Username"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:230
+msgid "SMTP.com Password"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:238
+msgid "SMTP.com Host"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:246
+msgid "SMTP.com Port"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:254
+msgid "SMTP.com Encryption"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:262
+msgid "Enter your SMTP.com settings below:"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:305
+msgid "Mailjet Settings"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:312
+msgid "Mailjet API Key"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:320
+msgid "Mailjet Secret Key"
+msgstr ""
+
+#: admin/class-wp-mail-master-settings.php:328
+msgid "Enter your Mailjet settings below:"
+msgstr ""
+
+#: admin/partials/wp-mail-master-admin-display.php:7
+#: admin/partials/wp-mail-master-admin-display.php:47
+msgid "Send Test Email"
+msgstr ""
+
+#: admin/partials/wp-mail-master-admin-display.php:54
+msgid "Send Email"
+msgstr ""
