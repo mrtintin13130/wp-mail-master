@@ -6,19 +6,21 @@
 }
 .email-service-item {
     position: relative;
-    border: 2px solid #ddd;
+    /* border: 2px solid #ddd; */
     border-radius: 10px;
     padding: 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: inset -3px -3px 7px #ffffff, inset 3px 3px 7px rgba(94, 104, 121, 0.945);
 }
 .email-service-item:hover {
     border-color: #007cba;
 }
 .email-service-item.selected {
-    border-color: #007cba;
+    /* border-color: #007cba; */
     background-color: #f0f7fc;
+    box-shadow: -5px -5px 7px #ffffff, 3px 3px 7px rgba(94, 104, 121, 0.945);
 }
 .email-service-item input[type="radio"] {
     position: absolute;
