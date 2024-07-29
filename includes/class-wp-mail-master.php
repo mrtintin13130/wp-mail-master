@@ -59,18 +59,21 @@ class WP_Mail_Master
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
     }
 
-    private function define_email_hooks() {
+    private function define_email_hooks()
+    {
         $this->loader->add_filter('wp_mail', $this, 'override_wp_mail');
     }
 
-    public function override_wp_mail($atts) {
+    public function override_wp_mail($atts)
+    {
         $emailer = new WP_Mail_Master_Emailer();
 
         // Extract the wp_mail attributes
         $to = $atts['to'];
         $subject = $atts['subject'];
         $message = $atts['message'];
-        $headers = isset($atts['headers']) ? $atts['headers'] : '';
+        $headers = isset($atts['headers']) ? $atts['headers'] : array();
+        $headers[] = 'Content-Type: text/html; charset=UTF-8';
         $attachments = isset($atts['attachments']) ? $atts['attachments'] : array();
 
         // Use the custom send_email method

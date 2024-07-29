@@ -71,6 +71,7 @@ class WP_Mail_Master_Emailer
 
             // Content
             $mail->isHTML(true);
+            $mail->CharSet = 'UTF-8';
             $mail->Subject = $subject;
             $mail->Body = $html_template;
 
@@ -291,8 +292,6 @@ class WP_Mail_Master_Emailer
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>' . esc_html($subject) . '</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </head>
     <body style="margin: 0; padding: 0;">
         <table border="0" cellpadding="0" cellspacing="0" width="100%">
