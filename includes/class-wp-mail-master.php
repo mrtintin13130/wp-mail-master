@@ -16,7 +16,6 @@ class WP_Mail_Master
         $this->load_dependencies();
         $this->set_locale();
         $this->define_admin_hooks();
-        // $this->define_public_hooks();
         $this->define_email_hooks();
     }
 
@@ -29,7 +28,6 @@ class WP_Mail_Master
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-ajax.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-logs.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-settings.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'public/class-wp-mail-master-public.php';
 
         $this->loader = new WP_Mail_Master_Loader();
     }
@@ -49,14 +47,6 @@ class WP_Mail_Master
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
         $this->loader->add_action('admin_menu', $plugin_admin, 'add_plugin_admin_menu');
         $this->loader->add_action('admin_init', $plugin_settings, 'register_settings');
-    }
-
-    private function define_public_hooks()
-    {
-        $plugin_public = new WP_Mail_Master_Public($this->get_plugin_name(), $this->get_version());
-
-        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
-        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
     }
 
     private function define_email_hooks()
