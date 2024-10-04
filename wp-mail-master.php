@@ -34,6 +34,9 @@ require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
  */
 require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/class-wp-mail-master.php';
 
+// Include the dashboard widget class
+require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-dashboard-widget.php';
+
 // Function to create the table
 function wp_mail_master_create_table() {
     global $wpdb;
@@ -70,6 +73,12 @@ register_activation_hook(__FILE__, __NAMESPACE__ . '\\wp_mail_master_create_tabl
 
 // Register the deactivation hook
 register_deactivation_hook(__FILE__, __NAMESPACE__ . '\\wp_mail_master_delete_table');
+
+// Initialize the dashboard widget
+function wp_mail_master_init_dashboard_widget() {
+    $widget = new WP_Mail_Master_Dashboard_Widget();
+}
+add_action('plugins_loaded', __NAMESPACE__ . '\\wp_mail_master_init_dashboard_widget');
 
 /**
  * Begins execution of the plugin.
