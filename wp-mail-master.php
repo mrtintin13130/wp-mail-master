@@ -3,11 +3,12 @@
  * Plugin Name: WP Mail Master
  * Plugin URI: https://example.com/wp-mail-master
  * Description: A fully featured email plugin for WordPress with API and SMTP support, email logging, and more.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Martho
  * Author URI: https://example.com
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+ * Requires at least: 6.0
  * Requires PHP: 8.1
  * Text Domain: wp-mail-master
  * Domain Path: /languages

@@ -90,14 +90,16 @@ class WP_Mail_Master_Settings {
     }
 
     public function wp_mail_master_from_email_callback() {
-        $options = get_option('wp_mail_master_options');
-        echo '<input type="email" name="wp_mail_master_options[from_email]" value="' . esc_attr($options['from_email']) . '" />';
+        $options = get_option('wp_mail_master_options', []); // Default to an empty array
+        $from_email = isset($options['from_email']) ? esc_attr($options['from_email']) : ''; // Use default empty value if not set
+        echo '<input type="email" name="wp_mail_master_options[from_email]" value="' . $from_email . '" />';
     }
-
+    
     public function wp_mail_master_from_name_callback() {
-        $options = get_option('wp_mail_master_options');
-        echo '<input type="text" name="wp_mail_master_options[from_name]" value="' . esc_attr($options['from_name']) . '" />';
-    }
+        $options = get_option('wp_mail_master_options', []); // Default to an empty array
+        $from_name = isset($options['from_name']) ? esc_attr($options['from_name']) : ''; // Use default empty value if not set
+        echo '<input type="text" name="wp_mail_master_options[from_name]" value="' . $from_name . '" />';
+    }    
 
     // SMTP
     private function add_smtp_settings() {
