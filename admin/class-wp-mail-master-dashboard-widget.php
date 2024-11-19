@@ -27,10 +27,7 @@ class WP_Mail_Master_Dashboard_Widget
         // Add custom CSS
         wp_add_inline_style('wp-admin', '
             .wp-mail-master-widget-container {
-                padding: 15px;
                 background: #fff;
-                border-radius: 8px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
             .wp-mail-master-stats {
                 display: flex;
