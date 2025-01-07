@@ -1,5 +1,5 @@
 <?php
-// includes/class-wp-mail-master.php
+// includes/WP_Mail_Master.php
 
 namespace Martho\WpMailMaster;
 
@@ -21,13 +21,20 @@ class WP_Mail_Master
 
     private function load_dependencies()
     {
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/class-wp-mail-master-loader.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/class-wp-mail-master-i18n.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/class-wp-mail-master-emailer.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-admin.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-ajax.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-logs.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-settings.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Loader.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_i18n.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Emailer.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_DB.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Queue.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Error_Handler.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Exception.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Admin.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Ajax.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Logs.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Settings.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Error_Logs.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Templates.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Template_Manager.php';
 
         $this->loader = new WP_Mail_Master_Loader();
     }
@@ -43,8 +50,7 @@ class WP_Mail_Master
         $plugin_admin = new WP_Mail_Master_Admin($this->get_plugin_name(), $this->get_version());
         $plugin_settings = new WP_Mail_Master_Settings($this->get_plugin_name(), $this->get_version());
 
-        $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
-        $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+        $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_assets');
         $this->loader->add_action('admin_menu', $plugin_admin, 'add_plugin_admin_menu');
         $this->loader->add_action('admin_init', $plugin_settings, 'register_settings');
     }

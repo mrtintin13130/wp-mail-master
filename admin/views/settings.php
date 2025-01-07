@@ -1,4 +1,15 @@
-<!-- admin/partials/wp-mail-master-admin-display.php -->
+<!-- admin/views/settings.php -->
+<?php
+// Check if this file is being accessed directly
+if (!defined('WPINC')) {
+    die;
+}
+
+// Verify we have our settings instance
+if (!isset($settings) || !($settings instanceof Martho\WpMailMaster\WP_Mail_Master_Settings)) {
+    wp_die(__('Invalid settings configuration.', 'wp-mail-master'));
+}
+?>
 
 <div class="wrap">
     <h1 style="display: flex; justify-content: space-between; align-items: center;">
@@ -9,6 +20,7 @@
     <form action="options.php" method="post">
         <?php
         settings_fields('wp_mail_master_settings');
+        $settings->settings_fields();
 
         // General Settings Section
         do_settings_sections('wp_mail_master_settings_general');
@@ -22,17 +34,17 @@
         echo '<div class="wp_mail_master_brevo_section">';
         do_settings_sections('wp_mail_master_brevo_section');
         echo '</div>';
-        
+
         // Sendgrid Settings Section
         echo '<div class="wp_mail_master_sendgrid_section">';
         do_settings_sections('wp_mail_master_sendgrid_section');
         echo '</div>';
-        
+
         // SMTP.com Settings Section
         echo '<div class="wp_mail_master_smtpcom_section">';
         do_settings_sections('wp_mail_master_smtpcom_section');
         echo '</div>';
-        
+
         // Mailjet Settings Section
         echo '<div class="wp_mail_master_mailjet_section">';
         do_settings_sections('wp_mail_master_mailjet_section');

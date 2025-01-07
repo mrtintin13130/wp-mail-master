@@ -1,6 +1,6 @@
 <?php
 
-// admin/class-wp-mail-master-settings.php
+// admin/WP_Mail_Master_Settings.php
 
 namespace Martho\WpMailMaster;
 
@@ -340,5 +340,135 @@ class WP_Mail_Master_Settings {
         $options = get_option('wp_mail_master_options');
         $secret_key = isset($options['mailjet_secret_key']) ? $options['mailjet_secret_key'] : '';
         echo '<input type="text" name="wp_mail_master_options[mailjet_secret_key]" value="' . esc_attr($secret_key) . '" />';
+    }
+
+    /**
+     * Comprehensive settings sanitization
+     */
+    public function sanitize_settings($input) {
+        // Verify nonce
+        if (!isset($_POST['wp_mail_master_nonce']) 
+        || !wp_verify_nonce($_POST['wp_mail_master_nonce'], 'wp_mail_master_settings') 
+        || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+            add_settings_error(
+                'wp_mail_master_messages',
+                'wp_mail_master_nonce_error',
+                __('Security verification failed. Please try again.', 'wp-mail-master'),
+                'error'
+            );
+            return get_option('wp_mail_master_options', array());
+        }
+
+        // Verify user capabilities
+        if (!current_user_can('manage_options')) {
+            add_settings_error(
+                'wp_mail_master_messages',
+                'wp_mail_master_capability_error',
+                __('You do not have sufficient permissions to modify these settings.', 'wp-mail-master'),
+                'error'
+            );
+            return get_option('wp_mail_master_options', array());
+        }
+
+        $sanitized = array();
+
+        // Sanitize general settings
+        $sanitized['email_service'] = isset($input['email_service']) ? 
+            sanitize_key($input['email_service']) : 'smtp';
+        
+        if (!array_key_exists($sanitized['email_service'], $this->email_services)) {
+            $sanitized['email_service'] = 'smtp';
+        }
+
+        $sanitized['from_email'] = isset($input['from_email']) ? 
+            sanitize_email($input['from_email']) : '';
+        $sanitized['from_name'] = isset($input['from_name']) ? 
+            sanitize_text_field($input['from_name']) : '';
+
+        // Sanitize SMTP settings
+        $sanitized['smtp_host'] = isset($input['smtp_host']) ? 
+            sanitize_text_field($input['smtp_host']) : '';
+        $sanitized['smtp_port'] = isset($input['smtp_port']) ? 
+            absint($input['smtp_port']) : 587;
+        $sanitized['smtp_username'] = isset($input['smtp_username']) ? 
+            sanitize_text_field($input['smtp_username']) : '';
+        
+        // Handle password only if it's being updated
+        if (!empty($input['smtp_password'])) {
+            $sanitized['smtp_password'] = wp_hash_password($input['smtp_password']);
+        } else {
+            // Retain existing password if not being updated
+            $existing_options = get_option('wp_mail_master_options', array());
+            $sanitized['smtp_password'] = isset($existing_options['smtp_password']) ? 
+                $existing_options['smtp_password'] : '';
+        }
+
+        $valid_encryptions = array('none', 'ssl', 'tls');
+        $sanitized['smtp_encryption'] = isset($input['smtp_encryption']) && 
+            in_array($input['smtp_encryption'], $valid_encryptions) ? 
+            $input['smtp_encryption'] : 'none';
+
+        // Sanitize API Keys
+        $sanitized['brevo_api_key'] = isset($input['brevo_api_key']) ? 
+            sanitize_text_field($input['brevo_api_key']) : '';
+        $sanitized['sendgrid_api_key'] = isset($input['sendgrid_api_key']) ? 
+            sanitize_text_field($input['sendgrid_api_key']) : '';
+        $sanitized['mailjet_api_key'] = isset($input['mailjet_api_key']) ? 
+            sanitize_text_field($input['mailjet_api_key']) : '';
+        $sanitized['mailjet_secret_key'] = isset($input['mailjet_secret_key']) ? 
+            sanitize_text_field($input['mailjet_secret_key']) : '';
+
+        return $sanitized;
+    }
+
+    /**
+     * Simple encryption for sensitive data
+     */
+    private function encrypt_password($password) {
+        if (function_exists('sodium_crypto_secretbox')) {
+            $key = $this->get_encryption_key();
+            $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+            $encrypted = sodium_crypto_secretbox($password, $nonce, $key);
+            return base64_encode($nonce . $encrypted);
+        }
+        return $password; // Fallback if sodium is not available
+    }
+
+    /**
+     * Get or generate encryption key
+     */
+    private function get_encryption_key() {
+        $key = get_option('wp_mail_master_encrypt_key');
+        if (empty($key)) {
+            $key = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+            update_option('wp_mail_master_encrypt_key', $key);
+        }
+        return $key;
+    }
+
+    /**
+     * Decrypt sensitive data
+     */
+    public function decrypt_password($encrypted) {
+        if (function_exists('sodium_crypto_secretbox') && !empty($encrypted)) {
+            try {
+                $decoded = base64_decode($encrypted);
+                $key = $this->get_encryption_key();
+                $nonce = mb_substr($decoded, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit');
+                $ciphertext = mb_substr($decoded, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, null, '8bit');
+                return sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
+            } catch (\Exception $e) {
+                error_log('WP Mail Master: Password decryption failed: ' . $e->getMessage());
+                return false;
+            }
+        }
+        return $encrypted; // Fallback if sodium is not available
+    }
+
+    /**
+     * Add nonce field to settings form
+     */
+    public function settings_fields() {
+        wp_nonce_field('wp_mail_master_settings', 'wp_mail_master_nonce');
     }
 }

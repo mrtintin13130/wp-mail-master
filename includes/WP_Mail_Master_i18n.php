@@ -1,6 +1,6 @@
 <?php
 
-// includes/class-wp-mail-master-i18n.php
+// includes/WP_Mail_Master_i18n.php
 
 namespace Martho\WpMailMaster;
 class WP_Mail_Master_i18n {

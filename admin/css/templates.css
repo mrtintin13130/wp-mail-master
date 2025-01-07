@@ -1,0 +1,153 @@
+/* admin/css/templates.css */
+
+.wp-mail-master-template-editor {
+  margin: 20px 0;
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.template-selection {
+  padding: 15px;
+  border-bottom: 1px solid #ccd0d4;
+  background: #f8f9fa;
+}
+
+.template-selection select {
+  min-width: 200px;
+}
+
+.wp-mail-master-template-presets {
+  margin: 20px 0;
+}
+
+.template-preset {
+  background: #fff;
+  transition: all 0.2s ease-in-out;
+}
+
+.template-preset:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.editor-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+.template-editor {
+  flex: 1;
+  min-width: 0;
+}
+
+.template-preview {
+  flex: 0 0 400px;
+  position: sticky;
+  top: 32px;
+}
+
+.template-header {
+  margin-bottom: 20px;
+}
+
+.template-name,
+.template-subject {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.template-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #e2e4e7;
+  border-radius: 4px;
+}
+
+.template-section h3 {
+  margin-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e2e4e7;
+}
+
+.section-colors {
+  margin: 15px 0;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #e2e4e7;
+  border-radius: 3px;
+}
+
+.section-colors label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.section-content {
+  margin-top: 15px;
+}
+
+.template-variables {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #e2e4e7;
+  border-radius: 4px;
+}
+
+.variables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.variable-item {
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e2e4e7;
+  border-radius: 3px;
+}
+
+.variable-item code {
+  display: block;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.variable-item .description {
+  font-size: 12px;
+  color: #666;
+}
+
+.preview-frame {
+  background: #fff;
+  border: 1px solid #e2e4e7;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.preview-frame iframe {
+  width: 100%;
+  height: 600px;
+  border: none;
+}
+
+.preview-actions {
+  text-align: right;
+}
+
+/* WordPress Color Picker Adjustments */
+.wp-picker-container {
+  display: inline-block;
+}
+
+.wp-picker-container .wp-color-result.button {
+  margin: 0 6px;
+}
+
+/* Media Upload Button Styles */
+.media-upload-button {
+  margin: 10px 0;
+}

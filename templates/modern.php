@@ -1,0 +1,5 @@
+<?php
+
+// templates/modern.php
+
+return ['name' => 'Modern Design', 'subject' => 'Email from {site_name}', 'content' => '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: \'Helvetica Neue\', Arial, sans-serif;"><div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><div style="background-color: #4f46e5; padding: 40px 20px; text-align: center;"><h1 style="color: #ffffff; margin: 0; font-weight: 300;">{email_title}</h1></div><div style="background-color: #ffffff; padding: 40px 20px;">{email_content}</div><div style="background-color: #f8f9fa; padding: 20px; font-size: 12px; color: #6b7280; text-align: center; border-top: 1px solid #e5e7eb;">© {year} {site_name} • <a href="{site_url}" style="color: #4f46e5; text-decoration: none;">Visit our website</a></div></div></body></html>'];

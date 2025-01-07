@@ -1,6 +1,6 @@
 <?php
 
-// includes/class-wp-mail-master-loader.php
+// includes/WP_Mail_Master_Loader.php
 
 namespace Martho\WpMailMaster;
 

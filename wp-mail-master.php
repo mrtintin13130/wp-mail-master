@@ -32,50 +32,76 @@ require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 /**
  * The core plugin class
  */
-require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/class-wp-mail-master.php';
+require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master.php';
 
 // Include the dashboard widget class
-require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/class-wp-mail-master-dashboard-widget.php';
+require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Dashboard_Widget.php';
 
 // Function to create the table
-function wp_mail_master_create_table() {
-    global $wpdb;
+// function wp_mail_master_create_table() {
+//     global $wpdb;
 
-    $table_name = $wpdb->prefix . 'wp_mail_master_logs';
-    $charset_collate = $wpdb->get_charset_collate();
+//     $table_name = $wpdb->prefix . 'wp_mail_master_logs';
+//     $charset_collate = $wpdb->get_charset_collate();
 
-    $sql = "CREATE TABLE $table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-        to_email varchar(100) NOT NULL,
-        subject varchar(255) NOT NULL,
-        message text NOT NULL,
-        status varchar(20) NOT NULL,
-        error_info text,
-        PRIMARY KEY  (id)
-    ) $charset_collate;";
+//     $sql = "CREATE TABLE $table_name (
+//         id mediumint(9) NOT NULL AUTO_INCREMENT,
+//         time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+//         to_email varchar(100) NOT NULL,
+//         subject varchar(255) NOT NULL,
+//         message text NOT NULL,
+//         status varchar(20) NOT NULL,
+//         error_info text,
+//         PRIMARY KEY  (id)
+//     ) $charset_collate;";
 
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
+//     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+//     dbDelta($sql);
+// }
 
 // Function to delete the table
-function wp_mail_master_delete_table() {
+function wp_mail_master_delete_table()
+{
     global $wpdb;
 
-    $table_name = $wpdb->prefix . 'wp_mail_master_logs';
-    $sql = "DROP TABLE IF EXISTS $table_name;";
-    $wpdb->query($sql);
+    if ($wpdb instanceof \wpdb) {
+        $table_name = $wpdb->prefix . 'wp_mail_master_logs';
+        $sql = "DROP TABLE IF EXISTS $table_name;";
+        $wpdb->query($sql);
+    }
 }
-
 // Register the activation hook
-register_activation_hook(__FILE__, __NAMESPACE__ . '\\wp_mail_master_create_table');
+register_activation_hook(__FILE__, function () {
+    // Create/upgrade database tables
+    $db = new WP_Mail_Master_DB();
+    $db->create_tables();
+    
+    // Create queue table if you're using it
+    if (class_exists('WP_Mail_Master_Queue')) {
+        WP_Mail_Master_Queue::create_queue_table();
+    }
+});
 
 // Register the deactivation hook
-register_deactivation_hook(__FILE__, __NAMESPACE__ . '\\wp_mail_master_delete_table');
+register_deactivation_hook(__FILE__, function() {
+    $db = new WP_Mail_Master_DB();
+    $db->delete_tables();
+});
+
+
+// Schedule cleanup
+if (!wp_next_scheduled('wp_mail_master_cleanup')) {
+    wp_schedule_event(time(), 'daily', 'wp_mail_master_cleanup');
+}
+
+add_action('wp_mail_master_cleanup', function () {
+    $db = new WP_Mail_Master_DB();
+    $db->cleanup_old_logs();
+});
 
 // Initialize the dashboard widget
-function wp_mail_master_init_dashboard_widget() {
+function wp_mail_master_init_dashboard_widget()
+{
     $widget = new WP_Mail_Master_Dashboard_Widget();
 }
 add_action('plugins_loaded', __NAMESPACE__ . '\\wp_mail_master_init_dashboard_widget');
@@ -83,7 +109,8 @@ add_action('plugins_loaded', __NAMESPACE__ . '\\wp_mail_master_init_dashboard_wi
 /**
  * Begins execution of the plugin.
  */
-function run_wp_mail_master() {
+function run_wp_mail_master()
+{
     $plugin = new WP_Mail_Master();
     $plugin->run();
 }
