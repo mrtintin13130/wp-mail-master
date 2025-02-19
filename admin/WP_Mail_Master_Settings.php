@@ -12,15 +12,37 @@ class WP_Mail_Master_Settings {
     public function __construct($plugin_name, $version) {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
+        
+        // Initialize with just the names first
         $this->email_services = array(
-            'smtp' => 'SMTP',
-            'brevo' => 'Brevo API',
-            'sendgrid' => 'SendGrid API',
-            'smtpcom' => 'SMTP.com',
-            'mailjet' => 'Mailjet',
+            'smtp' => array(
+                'name' => 'SMTP',
+            ),
+            'brevo' => array(
+                'name' => 'Brevo API',
+            ),
+            'sendgrid' => array(
+                'name' => 'SendGrid API',
+            ),
+            'smtpcom' => array(
+                'name' => 'SMTP.com',
+            ),
+            'mailjet' => array(
+                'name' => 'Mailjet',
+            ),
         );
 
+        add_action('init', array($this, 'init_service_descriptions'));
         add_action('admin_init', array($this, 'register_settings'));
+    }
+
+    public function init_service_descriptions() {
+        // Add descriptions after WordPress is fully loaded for translations to work
+        $this->email_services['smtp']['description'] = _x('Standard email protocol used by most email providers. Use this if you have an SMTP server or email hosting service.', 'Email service description', 'wp-mail-master');
+        $this->email_services['brevo']['description'] = _x('Formerly Sendinblue. Professional email service with high deliverability rates and detailed analytics.', 'Email service description', 'wp-mail-master');
+        $this->email_services['sendgrid']['description'] = _x('Twilio SendGrid\'s reliable email service with advanced features and excellent deliverability.', 'Email service description', 'wp-mail-master');
+        $this->email_services['smtpcom']['description'] = _x('Enterprise-level email delivery service with advanced security and tracking features.', 'Email service description', 'wp-mail-master');
+        $this->email_services['mailjet']['description'] = _x('European email service provider with GDPR compliance and powerful marketing tools.', 'Email service description', 'wp-mail-master');
     }
 
     public function register_settings() {
@@ -65,24 +87,37 @@ class WP_Mail_Master_Settings {
     }
 
     public function wp_mail_master_general_section_callback() {
-        echo '<p>' . __('Configure your email settings below:', 'wp-mail-master') . '</p>';
+        echo '<div class="wp-mail-master-section-description">';
+        echo '<p>' . __('Configure your email settings below. These settings determine how your WordPress site sends emails.', 'wp-mail-master') . '</p>';
+        echo '<p>' . __('Tips:', 'wp-mail-master') . '</p>';
+        echo '<ul class="wp-mail-master-tips">';
+        echo '<li>' . __('Choose an email service that best fits your needs', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Test your settings using the "Send Test Email" button after saving', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Check the Email Logs section to monitor email delivery status', 'wp-mail-master') . '</li>';
+        echo '</ul>';
+        echo '</div>';
     }
 
     public function wp_mail_master_email_service_callback() {
         $options = get_option('wp_mail_master_options');
         $current_service = isset($options['email_service']) ? $options['email_service'] : 'smtp';
         ?>
+        <div class="email-service-description">
+            <p><?php _e('Select your preferred email service. Each service has its own advantages:', 'wp-mail-master'); ?></p>
+        </div>
         <div class="email-service-grid">
-            <?php foreach ($this->email_services as $value => $label): ?>
+            <?php foreach ($this->email_services as $value => $service): ?>
                 <div class="email-service-item <?php echo $current_service === $value ? 'selected' : ''; ?>"
                      data-value="<?php echo esc_attr($value); ?>">
                     <input type="radio" name="wp_mail_master_options[email_service]" 
                            value="<?php echo esc_attr($value); ?>"
                            <?php checked($current_service, $value); ?>>
                     <div class="email-service-icon">
-                        <img src="<?php echo esc_url(plugins_url('assets/icons/' . $value . '.svg', WP_MAIL_MASTER_PLUGIN_FILE)); ?>" alt="<?php echo esc_attr($label); ?> icon">
+                        <img src="<?php echo esc_url(plugins_url('assets/icons/' . $value . '.svg', WP_MAIL_MASTER_PLUGIN_FILE)); ?>" 
+                             alt="<?php echo esc_attr($service['name']); ?> icon">
                     </div>
-                    <div class="email-service-label"><?php echo esc_html($label); ?></div>
+                    <div class="email-service-label"><?php echo esc_html($service['name']); ?></div>
+                    <div class="email-service-description"><?php echo esc_html($service['description']); ?></div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -90,16 +125,30 @@ class WP_Mail_Master_Settings {
     }
 
     public function wp_mail_master_from_email_callback() {
-        $options = get_option('wp_mail_master_options', []); // Default to an empty array
-        $from_email = isset($options['from_email']) ? esc_attr($options['from_email']) : ''; // Use default empty value if not set
-        echo '<input type="email" name="wp_mail_master_options[from_email]" value="' . $from_email . '" />';
+        $options = get_option('wp_mail_master_options', []);
+        $from_email = isset($options['from_email']) ? esc_attr($options['from_email']) : '';
+        ?>
+        <div class="setting-field">
+            <input type="email" name="wp_mail_master_options[from_email]" value="<?php echo $from_email; ?>" />
+            <p class="description">
+                <?php _e('The email address that all emails will be sent from. This should be a valid email address that you have access to.', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
     
     public function wp_mail_master_from_name_callback() {
-        $options = get_option('wp_mail_master_options', []); // Default to an empty array
-        $from_name = isset($options['from_name']) ? esc_attr($options['from_name']) : ''; // Use default empty value if not set
-        echo '<input type="text" name="wp_mail_master_options[from_name]" value="' . $from_name . '" />';
-    }    
+        $options = get_option('wp_mail_master_options', []);
+        $from_name = isset($options['from_name']) ? esc_attr($options['from_name']) : '';
+        ?>
+        <div class="setting-field">
+            <input type="text" name="wp_mail_master_options[from_name]" value="<?php echo $from_name; ?>" />
+            <p class="description">
+                <?php _e('The name that will appear as the sender of emails. This could be your website name, company name, or your name.', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
+    }
 
     // SMTP
     private function add_smtp_settings() {
@@ -131,7 +180,18 @@ class WP_Mail_Master_Settings {
     }
 
     public function wp_mail_master_smtp_section_callback() {
-        echo '<p>' . __('Enter your SMTP settings below:', 'wp-mail-master') . '</p>';
+        echo '<div class="wp-mail-master-section-description">';
+        echo '<p>' . __('SMTP (Simple Mail Transfer Protocol) is the standard protocol for sending emails. Enter your SMTP server details below:', 'wp-mail-master') . '</p>';
+        echo '<div class="wp-mail-master-help-box">';
+        echo '<h4>' . __('Common SMTP Providers:', 'wp-mail-master') . '</h4>';
+        echo '<ul>';
+        echo '<li><strong>Gmail:</strong> smtp.gmail.com (Port: 587, Encryption: TLS)</li>';
+        echo '<li><strong>Outlook/Office 365:</strong> smtp.office365.com (Port: 587, Encryption: TLS)</li>';
+        echo '<li><strong>Yahoo:</strong> smtp.mail.yahoo.com (Port: 587, Encryption: TLS)</li>';
+        echo '</ul>';
+        echo '<p><em>' . __('Note: Some providers may require you to create an "App Password" for security.', 'wp-mail-master') . '</em></p>';
+        echo '</div>';
+        echo '</div>';
     }
 
     public function wp_mail_master_smtp_field_callback($args) {
@@ -139,19 +199,33 @@ class WP_Mail_Master_Settings {
         $field_name = $args['field_name'];
         $field_value = isset($options[$field_name]) ? $options[$field_name] : '';
 
+        $descriptions = array(
+            'smtp_host' => __('The address of your SMTP server (e.g., smtp.gmail.com)', 'wp-mail-master'),
+            'smtp_port' => __('The port your SMTP server uses (common ports: 25, 465, 587)', 'wp-mail-master'),
+            'smtp_username' => __('Your SMTP account username (often your email address)', 'wp-mail-master'),
+            'smtp_password' => __('Your SMTP account password or app-specific password', 'wp-mail-master'),
+            'smtp_encryption' => __('The type of encryption your SMTP server uses', 'wp-mail-master')
+        );
+
+        echo '<div class="setting-field">';
         if ($field_name === 'smtp_password') {
             echo '<input type="password" name="wp_mail_master_options[' . esc_attr($field_name) . ']" value="' . esc_attr($field_value) . '" />';
         } elseif ($field_name === 'smtp_encryption') {
             ?>
             <select name="wp_mail_master_options[<?php echo esc_attr($field_name); ?>]">
-                <option value="none" <?php selected($field_value, 'none'); ?>>None</option>
-                <option value="ssl" <?php selected($field_value, 'ssl'); ?>>SSL</option>
-                <option value="tls" <?php selected($field_value, 'tls'); ?>>TLS</option>
+                <option value="none" <?php selected($field_value, 'none'); ?>><?php _e('None', 'wp-mail-master'); ?></option>
+                <option value="ssl" <?php selected($field_value, 'ssl'); ?>><?php _e('SSL', 'wp-mail-master'); ?></option>
+                <option value="tls" <?php selected($field_value, 'tls'); ?>><?php _e('TLS (recommended)', 'wp-mail-master'); ?></option>
             </select>
             <?php
         } else {
             echo '<input type="text" name="wp_mail_master_options[' . esc_attr($field_name) . ']" value="' . esc_attr($field_value) . '" />';
         }
+        
+        if (isset($descriptions[$field_name])) {
+            echo '<p class="description">' . esc_html($descriptions[$field_name]) . '</p>';
+        }
+        echo '</div>';
     }
 
     // Brevo
@@ -173,13 +247,28 @@ class WP_Mail_Master_Settings {
     }
 
     public function wp_mail_master_brevo_section_callback() {
-        echo '<p>' . __('Enter your Brevo API settings below:', 'wp-mail-master') . '</p>';
+        echo '<div class="wp-mail-master-section-description">';
+        echo '<p>' . __('Brevo (formerly Sendinblue) is a professional email service that offers:', 'wp-mail-master') . '</p>';
+        echo '<ul>';
+        echo '<li>' . __('High deliverability rates', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Detailed email analytics', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Advanced marketing features', 'wp-mail-master') . '</li>';
+        echo '</ul>';
+        echo '<p><a href="https://www.brevo.com/pricing/" target="_blank">' . __('Sign up for a Brevo account', 'wp-mail-master') . '</a></p>';
+        echo '</div>';
     }
 
     public function wp_mail_master_brevo_api_key_callback() {
         $options = get_option('wp_mail_master_options');
         $api_key = isset($options['brevo_api_key']) ? $options['brevo_api_key'] : '';
-        echo '<input type="text" name="wp_mail_master_options[brevo_api_key]" value="' . esc_attr($api_key) . '" />';
+        ?>
+        <div class="setting-field">
+            <input type="text" name="wp_mail_master_options[brevo_api_key]" value="<?php echo esc_attr($api_key); ?>" />
+            <p class="description">
+                <?php _e('Enter your Brevo API key. You can find this in your Brevo account under SMTP & API → API Keys.', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
 
     // SendGrid 
@@ -201,13 +290,29 @@ class WP_Mail_Master_Settings {
     }
 
     public function wp_mail_master_sendgrid_section_callback() {
-        echo '<p>' . __('Enter your SendGrid API settings below:', 'wp-mail-master') . '</p>';
+        echo '<div class="wp-mail-master-section-description">';
+        echo '<p>' . __('SendGrid is a leading email delivery platform that offers:', 'wp-mail-master') . '</p>';
+        echo '<ul>';
+        echo '<li>' . __('Industry-leading delivery rates', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Real-time analytics and reporting', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Advanced email validation', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('24/7 expert support', 'wp-mail-master') . '</li>';
+        echo '</ul>';
+        echo '<p><a href="https://sendgrid.com/pricing/" target="_blank">' . __('Sign up for a SendGrid account', 'wp-mail-master') . '</a></p>';
+        echo '</div>';
     }
 
     public function wp_mail_master_sendgrid_api_key_callback() {
         $options = get_option('wp_mail_master_options');
         $api_key = isset($options['sendgrid_api_key']) ? $options['sendgrid_api_key'] : '';
-        echo '<input type="text" name="wp_mail_master_options[sendgrid_api_key]" value="' . esc_attr($api_key) . '" />';
+        ?>
+        <div class="setting-field">
+            <input type="text" name="wp_mail_master_options[sendgrid_api_key]" value="<?php echo esc_attr($api_key); ?>" />
+            <p class="description">
+                <?php _e('Enter your SendGrid API key. You can create one in your SendGrid account under Settings → API Keys.', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
 
     // SMTP.COM
@@ -261,42 +366,84 @@ class WP_Mail_Master_Settings {
     }
 
     public function wp_mail_master_smtpcom_section_callback() {
-        echo '<p>' . __('Enter your SMTP.com settings below:', 'wp-mail-master') . '</p>';
+        echo '<div class="wp-mail-master-section-description">';
+        echo '<p>' . __('SMTP.com is an enterprise email delivery service offering:', 'wp-mail-master') . '</p>';
+        echo '<ul>';
+        echo '<li>' . __('Dedicated IP addresses', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Advanced security features', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Detailed delivery reports', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Enterprise-grade support', 'wp-mail-master') . '</li>';
+        echo '</ul>';
+        echo '<p><a href="https://smtp.com/pricing/" target="_blank">' . __('Sign up for an SMTP.com account', 'wp-mail-master') . '</a></p>';
+        echo '</div>';
     }
 
     public function wp_mail_master_smtpcom_username_callback() {
         $options = get_option('wp_mail_master_options');
         $username = isset($options['smtpcom_username']) ? $options['smtpcom_username'] : '';
-        echo '<input type="text" name="wp_mail_master_options[smtpcom_username]" value="' . esc_attr($username) . '" />';
+        ?>
+        <div class="setting-field">
+            <input type="text" name="wp_mail_master_options[smtpcom_username]" value="<?php echo esc_attr($username); ?>" />
+            <p class="description">
+                <?php _e('Your SMTP.com account username', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
 
     public function wp_mail_master_smtpcom_password_callback() {
         $options = get_option('wp_mail_master_options');
         $password = isset($options['smtpcom_password']) ? $options['smtpcom_password'] : '';
-        echo '<input type="password" name="wp_mail_master_options[smtpcom_password]" value="' . esc_attr($password) . '" />';
+        ?>
+        <div class="setting-field">
+            <input type="password" name="wp_mail_master_options[smtpcom_password]" value="<?php echo esc_attr($password); ?>" />
+            <p class="description">
+                <?php _e('Your SMTP.com account password', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
 
     public function wp_mail_master_smtpcom_host_callback() {
         $options = get_option('wp_mail_master_options');
         $host = isset($options['smtpcom_host']) ? $options['smtpcom_host'] : '';
-        echo '<input type="text" name="wp_mail_master_options[smtpcom_host]" value="' . esc_attr($host) . '" />';
+        ?>
+        <div class="setting-field">
+            <input type="text" name="wp_mail_master_options[smtpcom_host]" value="<?php echo esc_attr($host); ?>" />
+            <p class="description">
+                <?php _e('Your SMTP.com server hostname (usually smtp.com)', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
 
     public function wp_mail_master_smtpcom_port_callback() {
         $options = get_option('wp_mail_master_options');
         $port = isset($options['smtpcom_port']) ? $options['smtpcom_port'] : '';
-        echo '<input type="text" name="wp_mail_master_options[smtpcom_port]" value="' . esc_attr($port) . '" />';
+        ?>
+        <div class="setting-field">
+            <input type="text" name="wp_mail_master_options[smtpcom_port]" value="<?php echo esc_attr($port); ?>" />
+            <p class="description">
+                <?php _e('Your SMTP.com server port (usually 587 for TLS or 465 for SSL)', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
 
     public function wp_mail_master_smtpcom_encryption_callback() {
         $options = get_option('wp_mail_master_options');
         $encryption = isset($options['smtpcom_encryption']) ? $options['smtpcom_encryption'] : '';
         ?>
-        <select name="wp_mail_master_options[smtpcom_encryption]">
-            <option value="none" <?php selected($encryption, 'none'); ?>>None</option>
-            <option value="ssl" <?php selected($encryption, 'ssl'); ?>>SSL</option>
-            <option value="tls" <?php selected($encryption, 'tls'); ?>>TLS</option>
-        </select>
+        <div class="setting-field">
+            <select name="wp_mail_master_options[smtpcom_encryption]">
+                <option value="none" <?php selected($encryption, 'none'); ?>><?php _e('None', 'wp-mail-master'); ?></option>
+                <option value="ssl" <?php selected($encryption, 'ssl'); ?>><?php _e('SSL', 'wp-mail-master'); ?></option>
+                <option value="tls" <?php selected($encryption, 'tls'); ?>><?php _e('TLS (recommended)', 'wp-mail-master'); ?></option>
+            </select>
+            <p class="description">
+                <?php _e('The encryption method used by your SMTP.com server (TLS is recommended)', 'wp-mail-master'); ?>
+            </p>
+        </div>
         <?php
     }
 
@@ -327,19 +474,42 @@ class WP_Mail_Master_Settings {
     }
 
     public function wp_mail_master_mailjet_section_callback() {
-        echo '<p>' . __('Enter your Mailjet settings below:', 'wp-mail-master') . '</p>';
+        echo '<div class="wp-mail-master-section-description">';
+        echo '<p>' . __('Mailjet is a powerful email service provider offering:', 'wp-mail-master') . '</p>';
+        echo '<ul>';
+        echo '<li>' . __('GDPR compliance and EU data centers', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Advanced email analytics', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Drag & drop email designer', 'wp-mail-master') . '</li>';
+        echo '<li>' . __('Transactional and marketing email support', 'wp-mail-master') . '</li>';
+        echo '</ul>';
+        echo '<p><a href="https://www.mailjet.com/pricing/" target="_blank">' . __('Sign up for a Mailjet account', 'wp-mail-master') . '</a></p>';
+        echo '</div>';
     }
 
     public function wp_mail_master_mailjet_api_key_callback() {
         $options = get_option('wp_mail_master_options');
         $api_key = isset($options['mailjet_api_key']) ? $options['mailjet_api_key'] : '';
-        echo '<input type="text" name="wp_mail_master_options[mailjet_api_key]" value="' . esc_attr($api_key) . '" />';
+        ?>
+        <div class="setting-field">
+            <input type="text" name="wp_mail_master_options[mailjet_api_key]" value="<?php echo esc_attr($api_key); ?>" />
+            <p class="description">
+                <?php _e('Enter your Mailjet API Key. You can find this in your Mailjet account under Account Settings → API Keys.', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
 
     public function wp_mail_master_mailjet_secret_key_callback() {
         $options = get_option('wp_mail_master_options');
         $secret_key = isset($options['mailjet_secret_key']) ? $options['mailjet_secret_key'] : '';
-        echo '<input type="text" name="wp_mail_master_options[mailjet_secret_key]" value="' . esc_attr($secret_key) . '" />';
+        ?>
+        <div class="setting-field">
+            <input type="text" name="wp_mail_master_options[mailjet_secret_key]" value="<?php echo esc_attr($secret_key); ?>" />
+            <p class="description">
+                <?php _e('Enter your Mailjet Secret Key. This is paired with your API Key for authentication.', 'wp-mail-master'); ?>
+            </p>
+        </div>
+        <?php
     }
 
     /**
