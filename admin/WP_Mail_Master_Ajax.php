@@ -69,7 +69,7 @@ class WP_Mail_Master_Ajax
 
         if (false === $limit_count) {
             set_transient($transient_key, 1, HOUR_IN_SECONDS);
-        } else if ($limit_count >= 5) { // Max 5 test emails per hour
+        } else if ($limit_count >= 15) { // Max 5 test emails per hour
             throw new \Exception(__('Test email limit reached. Please try again later.', 'wp-mail-master'));
         } else {
             set_transient($transient_key, $limit_count + 1, HOUR_IN_SECONDS);

@@ -48,7 +48,8 @@ class WP_Mail_Master_Emailer
                 '{site_url}' => get_bloginfo('url'),
                 '{year}' => date('Y'),
                 '{date}' => date_i18n(get_option('date_format')),
-                '{email_title}' => $subject // Use the passed subject as email_title
+                '{email_title}' => $subject, // Use the passed subject as email_title
+                '{email_content}' => $message
             );
 
             // Parse template variables in subject
@@ -60,8 +61,8 @@ class WP_Mail_Master_Emailer
 
             // Replace variables in template
             $html_message = str_replace(
-                array_keys($variables) + ['{email_content}'],
-                array_values($variables) + [$message],
+                array_keys($variables),
+                array_values($variables),
                 $template['content']
             );
 
@@ -121,57 +122,11 @@ class WP_Mail_Master_Emailer
     }
     public function send_test_email($to)
     {
-        $subject = 'Test Email from {site_name}';
-        $message = '<p>This is a test email from WP Mail Master plugin.</p>';
+        $site_name = get_bloginfo('name');
+        $subject = 'Test Email from ' . $site_name;
+        $message = '<p>This is a test email from WP Mail Master plugin.</p>' .
+                  '<p>If you are reading this message, it means the email was delivered successfully and the plugin is working correctly.</p>' .
+                  '<p>You can now use WP Mail Master to send emails from your WordPress site with confidence.</p>';
         return $this->send_email($to, $subject, $message);
     }
-
-    // private function get_email_template($subject, $message)
-    // {
-    //     return '
-    // <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    // <html xmlns="http://www.w3.org/1999/xhtml">
-    // <head>
-    //     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    // </head>
-    // <body style="margin: 0; padding: 0;">
-    //     <table border="0" cellpadding="0" cellspacing="0" width="100%">
-    //         <tr>
-    //             <td style="padding: 20px 0 30px 0;">
-    //                 <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; border: 1px solid #cccccc;">
-    //                     <tr>
-    //                         <td align="center" bgcolor="#0073aa" style="padding: 40px 0 30px 0; color: #ffffff; font-size: 28px; font-weight: bold; font-family: Arial, sans-serif;">
-    //                             ' . esc_html($subject) . '
-    //                         </td>
-    //                     </tr>
-    //                     <tr>
-    //                         <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
-    //                             <table border="0" cellpadding="0" cellspacing="0" width="100%">
-    //                                 <tr>
-    //                                     <td style="color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 24px;">
-    //                                         ' . wp_kses_post($message) . '
-    //                                     </td>
-    //                                 </tr>
-    //                             </table>
-    //                         </td>
-    //                     </tr>
-    //                     <tr>
-    //                         <td bgcolor="#f7f7f7" style="padding: 30px 30px;">
-    //                             <table border="0" cellpadding="0" cellspacing="0" width="100%">
-    //                                 <tr>
-    //                                     <td style="color: #777777; font-family: Arial, sans-serif; font-size: 14px;" width="75%">
-    //                                         &copy; ' . date('Y') . ' WP Mail Master. All rights reserved.<br/>
-    //                                         <a href="' . site_url() . '" style="color: #0073aa; text-decoration: none;">Visit our website</a>
-    //                                     </td>
-    //                                 </tr>
-    //                             </table>
-    //                         </td>
-    //                     </tr>
-    //                 </table>
-    //             </td>
-    //         </tr>
-    //     </table>
-    // </body>
-    // </html>';
-    // }
 }
