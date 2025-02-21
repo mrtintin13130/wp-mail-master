@@ -49,10 +49,15 @@ class WP_Mail_Master
     {
         $plugin_admin = new WP_Mail_Master_Admin($this->get_plugin_name(), $this->get_version());
         $plugin_settings = new WP_Mail_Master_Settings($this->get_plugin_name(), $this->get_version());
+        $error_logs = new WP_Mail_Master_Error_Logs();
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_assets');
         $this->loader->add_action('admin_menu', $plugin_admin, 'add_plugin_admin_menu');
         $this->loader->add_action('admin_init', $plugin_settings, 'register_settings');
+        
+        // Add error logs handlers
+        $this->loader->add_action('admin_post_delete_error_log', $error_logs, 'handle_error_log_deletion');
+        $this->loader->add_action('admin_post_clear_error_logs', $error_logs, 'handle_clear_error_logs');
     }
 
     private function define_email_hooks()

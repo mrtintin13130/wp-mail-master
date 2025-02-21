@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP Mail Master 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-mail-master\n"
-"POT-Creation-Date: 2025-02-19T15:29:51+00:00\n"
-"PO-Revision-Date: 2025-02-19 16:30+0100\n"
+"POT-Creation-Date: 2025-02-19T16:27:29+00:00\n"
+"PO-Revision-Date: 2025-02-19 17:32+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -106,7 +106,8 @@ msgstr "Modifier"
 msgid "Set as Default"
 msgstr "Définir par défaut"
 
-#: admin/views/template-presets.php:56 admin/WP_Mail_Master_Logs.php:170
+#: admin/views/template-presets.php:56 admin/WP_Mail_Master_Error_Logs.php:223
+#: admin/WP_Mail_Master_Logs.php:167
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -208,12 +209,12 @@ msgid "WP Mail Master Settings"
 msgstr "Paramètres de WP Mail Master"
 
 #: admin/WP_Mail_Master_Admin.php:168 admin/WP_Mail_Master_Admin.php:169
-#: admin/WP_Mail_Master_Logs.php:110
+#: admin/WP_Mail_Master_Logs.php:109
 msgid "Email Logs"
 msgstr "Journaux d’e-mails"
 
 #: admin/WP_Mail_Master_Admin.php:178 admin/WP_Mail_Master_Admin.php:179
-#: admin/WP_Mail_Master_Error_Logs.php:18
+#: admin/WP_Mail_Master_Error_Logs.php:156
 msgid "Error Logs"
 msgstr "Journaux d’erreurs"
 
@@ -221,7 +222,8 @@ msgstr "Journaux d’erreurs"
 msgid "Settings"
 msgstr "Paramètres"
 
-#: admin/WP_Mail_Master_Admin.php:221 admin/WP_Mail_Master_Logs.php:89
+#: admin/WP_Mail_Master_Admin.php:221 admin/WP_Mail_Master_Error_Logs.php:140
+#: admin/WP_Mail_Master_Logs.php:88
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 "Vous ne disposez pas des autorisations suffisantes pour accéder à cette page."
@@ -234,13 +236,14 @@ msgstr "Paramètres enregistrés avec succès."
 msgid "Log entry deleted successfully."
 msgstr "Entrée de journal supprimée avec succès."
 
-#: admin/WP_Mail_Master_Ajax.php:23 admin/WP_Mail_Master_Logs.php:293
+#: admin/WP_Mail_Master_Ajax.php:23 admin/WP_Mail_Master_Error_Logs.php:53
+#: admin/WP_Mail_Master_Error_Logs.php:312 admin/WP_Mail_Master_Logs.php:280
 msgid "Security check failed."
-msgstr ""
+msgstr "Le contrôle de sécurité a échoué."
 
 #: admin/WP_Mail_Master_Ajax.php:28
 msgid "You do not have permission to perform this action."
-msgstr ""
+msgstr "Vous n’êtes pas autorisé à effectuer cette action."
 
 #: admin/WP_Mail_Master_Ajax.php:36 admin/WP_Mail_Master_Ajax.php:206
 msgid "Invalid email address."
@@ -248,152 +251,181 @@ msgstr "Adresse e-mail invalide."
 
 #: admin/WP_Mail_Master_Ajax.php:73
 msgid "Test email limit reached. Please try again later."
-msgstr ""
+msgstr "Limite d’e-mails de test atteinte. Veuillez réessayer plus tard."
 
 #: admin/WP_Mail_Master_Ajax.php:108
-#, fuzzy
-#| msgid "Test email sent successfully."
 msgid "Template saved successfully."
-msgstr "E-mail test envoyé avec succès."
+msgstr "Modèle enregistré avec succès."
 
 #: admin/WP_Mail_Master_Ajax.php:131
 msgid "Cannot delete preset templates."
-msgstr ""
+msgstr "Impossible de supprimer les modèles prédéfinis."
 
 #: admin/WP_Mail_Master_Ajax.php:160
 msgid "Permission denied."
-msgstr ""
+msgstr "Autorisation refusée."
 
 #: admin/WP_Mail_Master_Ajax.php:173 admin/WP_Mail_Master_Ajax.php:212
 msgid "Template not found."
-msgstr ""
+msgstr "Modèle introuvable."
 
 #: admin/WP_Mail_Master_Ajax.php:183
-#, fuzzy
-#| msgid "Test email sent successfully."
 msgid "Template selected successfully."
-msgstr "E-mail test envoyé avec succès."
+msgstr "Modèle sélectionné avec succès."
 
 #: admin/WP_Mail_Master_Ajax.php:240
 msgid "This is a test email from your website."
-msgstr ""
+msgstr "Ceci est un e-mail de test provenant de votre site Web."
 
 #: admin/WP_Mail_Master_Dashboard_Widget.php:18
-#, fuzzy
-#| msgid "Email Logs"
 msgid "Email Logs Overview"
-msgstr "Journaux d’e-mails"
+msgstr "Historique des e-mails"
 
-#: admin/WP_Mail_Master_Error_Logs.php:23 admin/WP_Mail_Master_Logs.php:131
-#: admin/WP_Mail_Master_Logs.php:234
-msgid "Time"
-msgstr "Date et heure"
+#: admin/WP_Mail_Master_Error_Logs.php:28
+msgid "Error log entry deleted successfully."
+msgstr "Entrée du journal des erreurs supprimée avec succès."
 
-#: admin/WP_Mail_Master_Error_Logs.php:24
-#, fuzzy
-#| msgid "Error Info"
-msgid "Error Code"
-msgstr "Informations sur l’erreur"
-
-#: admin/WP_Mail_Master_Error_Logs.php:25 admin/WP_Mail_Master_Logs.php:254
-msgid "Message"
-msgstr ""
-
-#: admin/WP_Mail_Master_Error_Logs.php:26
-msgid "Details"
-msgstr "Détails"
-
-#: admin/WP_Mail_Master_Error_Logs.php:32
-msgid "No errors logged."
-msgstr "Aucune erreur enregistrée."
+#: admin/WP_Mail_Master_Error_Logs.php:36
+msgid "All error logs cleared successfully."
+msgstr "Tous les journaux d’erreurs ont été effacés avec succès."
 
 #: admin/WP_Mail_Master_Error_Logs.php:48
-#, fuzzy
-#| msgid "Email Log Details"
-msgid "View Details"
-msgstr "Détails de l’e-mails"
+msgid "You do not have permission to clear error logs."
+msgstr "Vous n’êtes pas autorisé à effacer les journaux d’erreurs."
 
-#: admin/WP_Mail_Master_Error_Logs.php:54
-msgid "Enable WP_DEBUG to view details"
-msgstr ""
-
-#: admin/WP_Mail_Master_Logs.php:114
-msgid "Export Logs"
-msgstr "Exporter les journaux"
-
-#: admin/WP_Mail_Master_Logs.php:121
-msgid "Search Logs:"
-msgstr "Recherche dans l’historique :"
-
-#: admin/WP_Mail_Master_Logs.php:125
-msgid "Search Logs"
-msgstr "Rechercher dans l’historique"
-
-#: admin/WP_Mail_Master_Logs.php:132 admin/WP_Mail_Master_Logs.php:238
-msgid "To"
-msgstr "À"
-
-#: admin/WP_Mail_Master_Logs.php:133 admin/WP_Mail_Master_Logs.php:242
-msgid "Subject"
-msgstr "Objet"
-
-#: admin/WP_Mail_Master_Logs.php:134 admin/WP_Mail_Master_Logs.php:246
-msgid "Status"
-msgstr "Statut"
-
-#: admin/WP_Mail_Master_Logs.php:135
-msgid "Error Info"
-msgstr "Informations sur l’erreur"
-
-#: admin/WP_Mail_Master_Logs.php:136
-msgid "Actions"
-msgstr ""
-
-#: admin/WP_Mail_Master_Logs.php:142
-msgid "No logs found."
-msgstr "Aucun journal trouvé."
-
-#: admin/WP_Mail_Master_Logs.php:161
-msgid "View"
-msgstr "Voir"
-
-#: admin/WP_Mail_Master_Logs.php:169
-msgid "Are you sure you want to delete this log?"
-msgstr "Êtes-vous sûr de vouloir supprimer ce journal ?"
-
-#: admin/WP_Mail_Master_Logs.php:207 admin/WP_Mail_Master_Logs.php:298
+#: admin/WP_Mail_Master_Error_Logs.php:58
+#: admin/WP_Mail_Master_Error_Logs.php:317 admin/WP_Mail_Master_Logs.php:204
+#: admin/WP_Mail_Master_Logs.php:285
 msgid "WordPress database object not available."
 msgstr "Objet de base de données WordPress non disponible."
 
-#: admin/WP_Mail_Master_Logs.php:218
+#: admin/WP_Mail_Master_Error_Logs.php:65
+msgid "Failed to clear error logs."
+msgstr "Échec de la suppression des journaux d’erreurs."
+
+#: admin/WP_Mail_Master_Error_Logs.php:162
+msgid "Are you sure you want to clear all error logs?"
+msgstr "Êtes-vous sûr de vouloir effacer tous les journaux d’erreurs ?"
+
+#: admin/WP_Mail_Master_Error_Logs.php:163
+msgid "Clear All Logs"
+msgstr "Effacer tous les journaux"
+
+#: admin/WP_Mail_Master_Error_Logs.php:170
+msgid "Search Error Logs:"
+msgstr "Recherche dans l’historique :"
+
+#: admin/WP_Mail_Master_Error_Logs.php:174
+msgid "Search Error Logs"
+msgstr "Rechercher dans l’historique"
+
+#: admin/WP_Mail_Master_Error_Logs.php:180 admin/WP_Mail_Master_Logs.php:130
+#: admin/WP_Mail_Master_Logs.php:231
+msgid "Time"
+msgstr "Date et heure"
+
+#: admin/WP_Mail_Master_Error_Logs.php:181
+msgid "Error Code"
+msgstr "Code d’erreur"
+
+#: admin/WP_Mail_Master_Error_Logs.php:182 admin/WP_Mail_Master_Logs.php:251
+msgid "Message"
+msgstr "Message"
+
+#: admin/WP_Mail_Master_Error_Logs.php:183 admin/WP_Mail_Master_Logs.php:134
+msgid "Actions"
+msgstr "Actions"
+
+#: admin/WP_Mail_Master_Error_Logs.php:189
+msgid "No errors logged."
+msgstr "Aucune erreur enregistrée."
+
+#: admin/WP_Mail_Master_Error_Logs.php:207
+#: admin/WP_Mail_Master_Error_Logs.php:284
+msgid "Show Details"
+msgstr "Afficher les détails"
+
+#: admin/WP_Mail_Master_Error_Logs.php:222
+msgid "Are you sure you want to delete this error log?"
+msgstr "Êtes-vous sûr de vouloir supprimer ce journal ?"
+
+#: admin/WP_Mail_Master_Error_Logs.php:288
+msgid "Hide Details"
+msgstr "Masquer les détails"
+
+#: admin/WP_Mail_Master_Error_Logs.php:301
+msgid "You do not have permission to delete error logs."
+msgstr "Vous n’êtes pas autorisé à supprimer les journaux d’erreurs."
+
+#: admin/WP_Mail_Master_Error_Logs.php:307
+msgid "Invalid error log ID."
+msgstr "ID de journal invalide."
+
+#: admin/WP_Mail_Master_Error_Logs.php:329
+msgid "Failed to delete error log."
+msgstr "Échec de la suppression du journal."
+
+#: admin/WP_Mail_Master_Logs.php:113
+msgid "Export Logs"
+msgstr "Exporter les journaux"
+
+#: admin/WP_Mail_Master_Logs.php:120
+msgid "Search Logs:"
+msgstr "Recherche dans l’historique :"
+
+#: admin/WP_Mail_Master_Logs.php:124
+msgid "Search Logs"
+msgstr "Rechercher dans l’historique"
+
+#: admin/WP_Mail_Master_Logs.php:131 admin/WP_Mail_Master_Logs.php:235
+msgid "To"
+msgstr "À"
+
+#: admin/WP_Mail_Master_Logs.php:132 admin/WP_Mail_Master_Logs.php:239
+msgid "Subject"
+msgstr "Objet"
+
+#: admin/WP_Mail_Master_Logs.php:133 admin/WP_Mail_Master_Logs.php:243
+msgid "Status"
+msgstr "Statut"
+
+#: admin/WP_Mail_Master_Logs.php:140
+msgid "No logs found."
+msgstr "Aucun journal trouvé."
+
+#: admin/WP_Mail_Master_Logs.php:158
+msgid "View"
+msgstr "Voir"
+
+#: admin/WP_Mail_Master_Logs.php:166
+msgid "Are you sure you want to delete this log?"
+msgstr "Êtes-vous sûr de vouloir supprimer ce journal ?"
+
+#: admin/WP_Mail_Master_Logs.php:215
 msgid "Log entry not found."
 msgstr "Entrée de journal introuvable."
 
-#: admin/WP_Mail_Master_Logs.php:224
+#: admin/WP_Mail_Master_Logs.php:221
 msgid "Email Log Details"
 msgstr "Détails de l’e-mails"
 
-#: admin/WP_Mail_Master_Logs.php:228
+#: admin/WP_Mail_Master_Logs.php:225
 msgid "← Back to Logs"
 msgstr "← Retour aux journaux"
 
-#: admin/WP_Mail_Master_Logs.php:263
-msgid "Error Information"
-msgstr "Informations sur l’erreur"
-
-#: admin/WP_Mail_Master_Logs.php:282
+#: admin/WP_Mail_Master_Logs.php:269
 msgid "You do not have permission to delete logs."
-msgstr ""
+msgstr "Vous n’êtes pas autorisé à supprimer les journaux."
 
-#: admin/WP_Mail_Master_Logs.php:288
+#: admin/WP_Mail_Master_Logs.php:275
 msgid "Invalid log ID."
 msgstr "ID de journal invalide."
 
-#: admin/WP_Mail_Master_Logs.php:310
+#: admin/WP_Mail_Master_Logs.php:297
 msgid "Failed to delete log."
 msgstr "Échec de la suppression du journal."
 
-#: admin/WP_Mail_Master_Settings.php:18
+#: admin/WP_Mail_Master_Settings.php:41
 msgctxt "Email service description"
 msgid ""
 "Standard email protocol used by most email providers. Use this if you have "
@@ -403,7 +435,7 @@ msgstr ""
 "messagerie. Utilisez-le si vous disposez d’un serveur SMTP ou d’un service "
 "d’hébergement de messagerie."
 
-#: admin/WP_Mail_Master_Settings.php:22
+#: admin/WP_Mail_Master_Settings.php:42
 msgctxt "Email service description"
 msgid ""
 "Formerly Sendinblue. Professional email service with high deliverability "
@@ -412,7 +444,7 @@ msgstr ""
 "Anciennement Sendinblue. Service de messagerie professionnel avec des taux "
 "de délivrabilité élevés et des analyses détaillées."
 
-#: admin/WP_Mail_Master_Settings.php:26
+#: admin/WP_Mail_Master_Settings.php:43
 msgctxt "Email service description"
 msgid ""
 "Twilio SendGrid's reliable email service with advanced features and "
@@ -421,7 +453,7 @@ msgstr ""
 "Le service de messagerie fiable de Twilio SendGrid avec des fonctionnalités "
 "avancées et une excellente délivrabilité."
 
-#: admin/WP_Mail_Master_Settings.php:30
+#: admin/WP_Mail_Master_Settings.php:44
 msgctxt "Email service description"
 msgid ""
 "Enterprise-level email delivery service with advanced security and tracking "
@@ -430,7 +462,7 @@ msgstr ""
 "Service de livraison de courrier électronique de niveau entreprise avec "
 "fonctionnalités avancées de sécurité et de suivi."
 
-#: admin/WP_Mail_Master_Settings.php:34
+#: admin/WP_Mail_Master_Settings.php:45
 msgctxt "Email service description"
 msgid ""
 "European email service provider with GDPR compliance and powerful marketing "
@@ -439,23 +471,23 @@ msgstr ""
 "Fournisseur européen de services de messagerie conforme au RGPD et doté de "
 "puissants outils marketing."
 
-#: admin/WP_Mail_Master_Settings.php:46
+#: admin/WP_Mail_Master_Settings.php:53
 msgid "General Settings"
 msgstr "Réglages Généraux"
 
-#: admin/WP_Mail_Master_Settings.php:53
+#: admin/WP_Mail_Master_Settings.php:60
 msgid "Email Service"
 msgstr "Service d’email"
 
-#: admin/WP_Mail_Master_Settings.php:61
+#: admin/WP_Mail_Master_Settings.php:68
 msgid "From Email"
 msgstr "Depuis l’email"
 
-#: admin/WP_Mail_Master_Settings.php:69
+#: admin/WP_Mail_Master_Settings.php:76
 msgid "From Name"
 msgstr "Depuis le nom"
 
-#: admin/WP_Mail_Master_Settings.php:84
+#: admin/WP_Mail_Master_Settings.php:91
 msgid ""
 "Configure your email settings below. These settings determine how your "
 "WordPress site sends emails."
@@ -463,35 +495,35 @@ msgstr ""
 "Configurez vos paramètres de messagerie ci-dessous. Ces paramètres "
 "déterminent la manière dont votre site WordPress envoie les e-mails."
 
-#: admin/WP_Mail_Master_Settings.php:85
+#: admin/WP_Mail_Master_Settings.php:92
 msgid "Tips:"
 msgstr "Astuces:"
 
-#: admin/WP_Mail_Master_Settings.php:87
+#: admin/WP_Mail_Master_Settings.php:94
 msgid "Choose an email service that best fits your needs"
 msgstr ""
 "Choisissez un service de messagerie qui correspond le mieux à vos besoins"
 
-#: admin/WP_Mail_Master_Settings.php:88
+#: admin/WP_Mail_Master_Settings.php:95
 msgid "Test your settings using the \"Send Test Email\" button after saving"
 msgstr ""
 "Testez vos paramètres à l’aide du bouton « Envoyer un e-mail de test » après "
 "avoir enregistré"
 
-#: admin/WP_Mail_Master_Settings.php:89
+#: admin/WP_Mail_Master_Settings.php:96
 msgid "Check the Email Logs section to monitor email delivery status"
 msgstr ""
 "Consultez la section Journaux de courrier électronique pour surveiller "
 "l’état de livraison des e-mails"
 
-#: admin/WP_Mail_Master_Settings.php:99
+#: admin/WP_Mail_Master_Settings.php:106
 msgid ""
 "Select your preferred email service. Each service has its own advantages:"
 msgstr ""
 "Sélectionnez votre service de messagerie préféré. Chaque service a ses "
 "propres avantages :"
 
-#: admin/WP_Mail_Master_Settings.php:127
+#: admin/WP_Mail_Master_Settings.php:134
 msgid ""
 "The email address that all emails will be sent from. This should be a valid "
 "email address that you have access to."
@@ -499,7 +531,7 @@ msgstr ""
 "L’adresse e-mail à partir de laquelle tous les e-mails seront envoyés. Il "
 "doit s’agir d’une adresse e-mail valide à laquelle vous avez accès."
 
-#: admin/WP_Mail_Master_Settings.php:140
+#: admin/WP_Mail_Master_Settings.php:147
 msgid ""
 "The name that will appear as the sender of emails. This could be your "
 "website name, company name, or your name."
@@ -507,31 +539,31 @@ msgstr ""
 "Le nom qui apparaîtra comme expéditeur des e-mails. Il peut s’agir du nom de "
 "votre site Web, du nom de votre entreprise ou de votre nom."
 
-#: admin/WP_Mail_Master_Settings.php:150
+#: admin/WP_Mail_Master_Settings.php:157
 msgid "SMTP Settings"
 msgstr "Paramètres SMTP"
 
-#: admin/WP_Mail_Master_Settings.php:156
+#: admin/WP_Mail_Master_Settings.php:163
 msgid "SMTP Host"
 msgstr "Hôte SMTP"
 
-#: admin/WP_Mail_Master_Settings.php:157
+#: admin/WP_Mail_Master_Settings.php:164
 msgid "SMTP Port"
 msgstr "Port SMTP"
 
-#: admin/WP_Mail_Master_Settings.php:158
+#: admin/WP_Mail_Master_Settings.php:165
 msgid "SMTP Username"
 msgstr "Nom d’utilisateur SMTP"
 
-#: admin/WP_Mail_Master_Settings.php:159
+#: admin/WP_Mail_Master_Settings.php:166
 msgid "SMTP Password"
 msgstr "Mot de passe SMTP"
 
-#: admin/WP_Mail_Master_Settings.php:160
+#: admin/WP_Mail_Master_Settings.php:167
 msgid "Encryption"
 msgstr "Chiffrement"
 
-#: admin/WP_Mail_Master_Settings.php:177
+#: admin/WP_Mail_Master_Settings.php:184
 msgid ""
 "SMTP (Simple Mail Transfer Protocol) is the standard protocol for sending "
 "emails. Enter your SMTP server details below:"
@@ -539,11 +571,11 @@ msgstr ""
 "SMTP (Simple Mail Transfer Protocol) est le protocole standard pour l’envoi "
 "d’e-mails. Entrez les détails de votre serveur SMTP ci-dessous :"
 
-#: admin/WP_Mail_Master_Settings.php:179
+#: admin/WP_Mail_Master_Settings.php:186
 msgid "Common SMTP Providers:"
 msgstr "Fournisseurs SMTP courants :"
 
-#: admin/WP_Mail_Master_Settings.php:185
+#: admin/WP_Mail_Master_Settings.php:192
 msgid ""
 "Note: Some providers may require you to create an \"App Password\" for "
 "security."
@@ -551,71 +583,71 @@ msgstr ""
 "Remarque : Certains fournisseurs peuvent vous demander de créer un « mot de "
 "passe d’application » pour des raisons de sécurité."
 
-#: admin/WP_Mail_Master_Settings.php:196
+#: admin/WP_Mail_Master_Settings.php:203
 msgid "The address of your SMTP server (e.g., smtp.gmail.com)"
 msgstr "L’adresse de votre serveur SMTP (par exemple, smtp.gmail.com)"
 
-#: admin/WP_Mail_Master_Settings.php:197
+#: admin/WP_Mail_Master_Settings.php:204
 msgid "The port your SMTP server uses (common ports: 25, 465, 587)"
 msgstr "Le port utilisé par votre serveur SMTP (ports communs : 25, 465, 587)"
 
-#: admin/WP_Mail_Master_Settings.php:198
+#: admin/WP_Mail_Master_Settings.php:205
 msgid "Your SMTP account username (often your email address)"
 msgstr "Nom d’utilisateur de votre compte SMTP (souvent votre adresse e-mail)"
 
-#: admin/WP_Mail_Master_Settings.php:199
+#: admin/WP_Mail_Master_Settings.php:206
 msgid "Your SMTP account password or app-specific password"
 msgstr ""
 "Mot de passe de votre compte SMTP ou mot de passe spécifique à l’application"
 
-#: admin/WP_Mail_Master_Settings.php:200
+#: admin/WP_Mail_Master_Settings.php:207
 msgid "The type of encryption your SMTP server uses"
 msgstr "Le type de cryptage utilisé par votre serveur SMTP"
 
-#: admin/WP_Mail_Master_Settings.php:209 admin/WP_Mail_Master_Settings.php:432
+#: admin/WP_Mail_Master_Settings.php:216 admin/WP_Mail_Master_Settings.php:439
 msgid "None"
 msgstr "Aucun"
 
-#: admin/WP_Mail_Master_Settings.php:210 admin/WP_Mail_Master_Settings.php:433
+#: admin/WP_Mail_Master_Settings.php:217 admin/WP_Mail_Master_Settings.php:440
 msgid "SSL"
 msgstr ""
 
-#: admin/WP_Mail_Master_Settings.php:211 admin/WP_Mail_Master_Settings.php:434
+#: admin/WP_Mail_Master_Settings.php:218 admin/WP_Mail_Master_Settings.php:441
 msgid "TLS (recommended)"
 msgstr "TLS (recommandé)"
 
-#: admin/WP_Mail_Master_Settings.php:228
+#: admin/WP_Mail_Master_Settings.php:235
 msgid "Brevo API Settings"
 msgstr "Paramètres de l’API Brevo"
 
-#: admin/WP_Mail_Master_Settings.php:235
+#: admin/WP_Mail_Master_Settings.php:242
 msgid "Brevo API Key"
 msgstr "Clé API Brevo"
 
-#: admin/WP_Mail_Master_Settings.php:244
+#: admin/WP_Mail_Master_Settings.php:251
 msgid ""
 "Brevo (formerly Sendinblue) is a professional email service that offers:"
 msgstr ""
 "Brevo (anciennement Sendinblue) est un service de messagerie professionnel "
 "qui propose :"
 
-#: admin/WP_Mail_Master_Settings.php:246
+#: admin/WP_Mail_Master_Settings.php:253
 msgid "High deliverability rates"
 msgstr "Des taux de délivrabilité élevés"
 
-#: admin/WP_Mail_Master_Settings.php:247
+#: admin/WP_Mail_Master_Settings.php:254
 msgid "Detailed email analytics"
 msgstr "Analyse détaillée des e-mails"
 
-#: admin/WP_Mail_Master_Settings.php:248
+#: admin/WP_Mail_Master_Settings.php:255
 msgid "Advanced marketing features"
 msgstr "Fonctionnalités marketing avancées"
 
-#: admin/WP_Mail_Master_Settings.php:250
+#: admin/WP_Mail_Master_Settings.php:257
 msgid "Sign up for a Brevo account"
 msgstr "Créez un compte Brevo"
 
-#: admin/WP_Mail_Master_Settings.php:261
+#: admin/WP_Mail_Master_Settings.php:268
 msgid ""
 "Enter your Brevo API key. You can find this in your Brevo account under SMTP "
 "& API → API Keys."
@@ -623,39 +655,39 @@ msgstr ""
 "Entrez votre clé API Brevo. Vous pouvez le trouver dans votre compte Brevo "
 "sous SMTP et API → Clés API."
 
-#: admin/WP_Mail_Master_Settings.php:271
+#: admin/WP_Mail_Master_Settings.php:278
 msgid "SendGrid Settings"
 msgstr "Paramètres SendGrid"
 
-#: admin/WP_Mail_Master_Settings.php:278
+#: admin/WP_Mail_Master_Settings.php:285
 msgid "SendGrid API Key"
 msgstr "Clé API SendGrid"
 
-#: admin/WP_Mail_Master_Settings.php:287
+#: admin/WP_Mail_Master_Settings.php:294
 msgid "SendGrid is a leading email delivery platform that offers:"
 msgstr "SendGrid est une plateforme leader de livraison d’e-mails qui offre :"
 
-#: admin/WP_Mail_Master_Settings.php:289
+#: admin/WP_Mail_Master_Settings.php:296
 msgid "Industry-leading delivery rates"
 msgstr "Des taux de livraison parmi les meilleurs du secteur"
 
-#: admin/WP_Mail_Master_Settings.php:290
+#: admin/WP_Mail_Master_Settings.php:297
 msgid "Real-time analytics and reporting"
 msgstr "Analyses et rapports en temps réel"
 
-#: admin/WP_Mail_Master_Settings.php:291
+#: admin/WP_Mail_Master_Settings.php:298
 msgid "Advanced email validation"
 msgstr "Validation avancée des e-mails"
 
-#: admin/WP_Mail_Master_Settings.php:292
+#: admin/WP_Mail_Master_Settings.php:299
 msgid "24/7 expert support"
 msgstr "Assistance experte 24h/24 et 7j/7"
 
-#: admin/WP_Mail_Master_Settings.php:294
+#: admin/WP_Mail_Master_Settings.php:301
 msgid "Sign up for a SendGrid account"
 msgstr "Inscrivez-vous pour un compte SendGrid"
 
-#: admin/WP_Mail_Master_Settings.php:305
+#: admin/WP_Mail_Master_Settings.php:312
 msgid ""
 "Enter your SendGrid API key. You can create one in your SendGrid account "
 "under Settings → API Keys."
@@ -663,117 +695,117 @@ msgstr ""
 "Entrez votre clé API SendGrid. Vous pouvez en créer un dans votre compte "
 "SendGrid sous Paramètres → Clés API."
 
-#: admin/WP_Mail_Master_Settings.php:315
+#: admin/WP_Mail_Master_Settings.php:322
 msgid "SMTP.com Settings"
 msgstr "Paramètres SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:322
+#: admin/WP_Mail_Master_Settings.php:329
 msgid "SMTP.com Username"
 msgstr "Nom d’utilisateur SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:330
+#: admin/WP_Mail_Master_Settings.php:337
 msgid "SMTP.com Password"
 msgstr "Mot de passe SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:338
+#: admin/WP_Mail_Master_Settings.php:345
 msgid "SMTP.com Host"
 msgstr "Hôte SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:346
+#: admin/WP_Mail_Master_Settings.php:353
 msgid "SMTP.com Port"
 msgstr "Port SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:354
+#: admin/WP_Mail_Master_Settings.php:361
 msgid "SMTP.com Encryption"
 msgstr "Chiffrement SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:363
+#: admin/WP_Mail_Master_Settings.php:370
 msgid "SMTP.com is an enterprise email delivery service offering:"
 msgstr ""
 "SMTP.com est un service de livraison de courrier électronique d’entreprise "
 "offrant :"
 
-#: admin/WP_Mail_Master_Settings.php:365
+#: admin/WP_Mail_Master_Settings.php:372
 msgid "Dedicated IP addresses"
 msgstr "Adresses IP dédiées"
 
-#: admin/WP_Mail_Master_Settings.php:366
+#: admin/WP_Mail_Master_Settings.php:373
 msgid "Advanced security features"
 msgstr "Fonctionnalités de sécurité avancées"
 
-#: admin/WP_Mail_Master_Settings.php:367
+#: admin/WP_Mail_Master_Settings.php:374
 msgid "Detailed delivery reports"
 msgstr "Rapports de livraison détaillés"
 
-#: admin/WP_Mail_Master_Settings.php:368
+#: admin/WP_Mail_Master_Settings.php:375
 msgid "Enterprise-grade support"
 msgstr "Support de niveau entreprise"
 
-#: admin/WP_Mail_Master_Settings.php:370
+#: admin/WP_Mail_Master_Settings.php:377
 msgid "Sign up for an SMTP.com account"
 msgstr "Inscrivez-vous pour un compte SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:381
+#: admin/WP_Mail_Master_Settings.php:388
 msgid "Your SMTP.com account username"
 msgstr "Nom d’utilisateur SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:394
+#: admin/WP_Mail_Master_Settings.php:401
 msgid "Your SMTP.com account password"
 msgstr "Mot de passe SMTP.com"
 
-#: admin/WP_Mail_Master_Settings.php:407
+#: admin/WP_Mail_Master_Settings.php:414
 msgid "Your SMTP.com server hostname (usually smtp.com)"
 msgstr "Le nom d’hôte de votre serveur SMTP.com (généralement smtp.com)"
 
-#: admin/WP_Mail_Master_Settings.php:420
+#: admin/WP_Mail_Master_Settings.php:427
 msgid "Your SMTP.com server port (usually 587 for TLS or 465 for SSL)"
 msgstr ""
 "Le port de votre serveur SMTP.com (généralement 587 pour TLS ou 465 pour SSL)"
 
-#: admin/WP_Mail_Master_Settings.php:437
+#: admin/WP_Mail_Master_Settings.php:444
 msgid "The encryption method used by your SMTP.com server (TLS is recommended)"
 msgstr ""
 "La méthode de cryptage utilisée par votre serveur SMTP.com (TLS est "
 "recommandé)"
 
-#: admin/WP_Mail_Master_Settings.php:447
+#: admin/WP_Mail_Master_Settings.php:454
 msgid "Mailjet Settings"
 msgstr "Paramètres Mailjet"
 
-#: admin/WP_Mail_Master_Settings.php:454
+#: admin/WP_Mail_Master_Settings.php:461
 msgid "Mailjet API Key"
 msgstr "Clé API Mailjet"
 
-#: admin/WP_Mail_Master_Settings.php:462
+#: admin/WP_Mail_Master_Settings.php:469
 msgid "Mailjet Secret Key"
 msgstr "Clé secrète Mailjet"
 
-#: admin/WP_Mail_Master_Settings.php:471
+#: admin/WP_Mail_Master_Settings.php:478
 msgid "Mailjet is a powerful email service provider offering:"
 msgstr ""
 "Mailjet est un puissant fournisseur de services de messagerie proposant :"
 
-#: admin/WP_Mail_Master_Settings.php:473
+#: admin/WP_Mail_Master_Settings.php:480
 msgid "GDPR compliance and EU data centers"
 msgstr "Conformité au RGPD et centres de données de l’UE"
 
-#: admin/WP_Mail_Master_Settings.php:474
+#: admin/WP_Mail_Master_Settings.php:481
 msgid "Advanced email analytics"
 msgstr "Analyse avancée des e-mails"
 
-#: admin/WP_Mail_Master_Settings.php:475
+#: admin/WP_Mail_Master_Settings.php:482
 msgid "Drag & drop email designer"
 msgstr "Concepteur d’e-mails par glisser-déposer"
 
-#: admin/WP_Mail_Master_Settings.php:476
+#: admin/WP_Mail_Master_Settings.php:483
 msgid "Transactional and marketing email support"
 msgstr "Support pour e-mails transactionnels et marketing"
 
-#: admin/WP_Mail_Master_Settings.php:478
+#: admin/WP_Mail_Master_Settings.php:485
 msgid "Sign up for a Mailjet account"
 msgstr "Créer un compte Mailjet"
 
-#: admin/WP_Mail_Master_Settings.php:489
+#: admin/WP_Mail_Master_Settings.php:496
 msgid ""
 "Enter your Mailjet API Key. You can find this in your Mailjet account under "
 "Account Settings → API Keys."
@@ -781,7 +813,7 @@ msgstr ""
 "Saisissez votre clé API Mailjet. Vous pouvez le trouver dans votre compte "
 "Mailjet sous Paramètres du compte → Clés API."
 
-#: admin/WP_Mail_Master_Settings.php:502
+#: admin/WP_Mail_Master_Settings.php:509
 msgid ""
 "Enter your Mailjet Secret Key. This is paired with your API Key for "
 "authentication."
@@ -789,11 +821,11 @@ msgstr ""
 "Saisissez votre clé secrète Mailjet. Ceci est associé à votre clé API pour "
 "l’authentification."
 
-#: admin/WP_Mail_Master_Settings.php:519
+#: admin/WP_Mail_Master_Settings.php:526
 msgid "Security verification failed. Please try again."
 msgstr "La vérification de sécurité a échoué. Veuillez réessayer."
 
-#: admin/WP_Mail_Master_Settings.php:530
+#: admin/WP_Mail_Master_Settings.php:537
 msgid "You do not have sufficient permissions to modify these settings."
 msgstr ""
 "Vous ne disposez pas des autorisations suffisantes pour modifier ces "
@@ -822,3 +854,12 @@ msgstr "Date actuelle"
 #: includes/WP_Mail_Master_Emailer.php:39
 msgid "Invalid recipient email address."
 msgstr "Adresse e-mail du destinataire invalide."
+
+#~ msgid "Details"
+#~ msgstr "Détails"
+
+#~ msgid "Error Info"
+#~ msgstr "Informations sur l’erreur"
+
+#~ msgid "Error Information"
+#~ msgstr "Informations sur l’erreur"

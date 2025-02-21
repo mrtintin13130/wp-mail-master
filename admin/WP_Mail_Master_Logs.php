@@ -59,10 +59,9 @@ class WP_Mail_Master_Logs
             array_push($params, $search_term, $search_term);
         }
 
-        $query = "SELECT SQL_CALC_FOUND_ROWS USE INDEX (time_idx)
-            id, time, to_email, subject, status,
-            SUBSTRING(error_info, 1, 100) as error_info
-        FROM $table_name $where ORDER BY time DESC LIMIT %d OFFSET %d";
+        $query = "SELECT SQL_CALC_FOUND_ROWS 
+            id, time, to_email, subject, status
+        FROM $table_name USE INDEX (idx_time) $where ORDER BY time DESC LIMIT %d OFFSET %d";
         $logs = $wpdb->get_results($wpdb->prepare($query, $params));
 
         // Get total items for pagination
@@ -132,14 +131,13 @@ class WP_Mail_Master_Logs
                         <th scope="col"><?php echo esc_html__('To', 'wp-mail-master'); ?></th>
                         <th scope="col"><?php echo esc_html__('Subject', 'wp-mail-master'); ?></th>
                         <th scope="col"><?php echo esc_html__('Status', 'wp-mail-master'); ?></th>
-                        <th scope="col"><?php echo esc_html__('Error Info', 'wp-mail-master'); ?></th>
                         <th scope="col"><?php echo esc_html__('Actions', 'wp-mail-master'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($logs)): ?>
                         <tr>
-                            <td colspan="6"><?php echo esc_html__('No logs found.', 'wp-mail-master'); ?></td>
+                            <td colspan="5"><?php echo esc_html__('No logs found.', 'wp-mail-master'); ?></td>
                         </tr>
                     <?php endif; ?>
 
@@ -153,7 +151,6 @@ class WP_Mail_Master_Logs
                                     <?php echo esc_html($log->status); ?>
                                 </span>
                             </td>
-                            <td><?php echo esc_html($log->error_info); ?></td>
                             <td>
                                 <div class="row-actions">
                                     <span class="view">
@@ -258,16 +255,6 @@ class WP_Mail_Master_Logs
                         </div>
                     </td>
                 </tr>
-                <?php if (!empty($log->error_info)): ?>
-                    <tr>
-                        <th scope="row"><?php echo esc_html__('Error Information', 'wp-mail-master'); ?></th>
-                        <td>
-                            <div class="error-info">
-                                <?php echo wp_kses_post($log->error_info); ?>
-                            </div>
-                        </td>
-                    </tr>
-                <?php endif; ?>
             </table>
         </div>
         <?php
