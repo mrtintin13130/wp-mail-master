@@ -28,10 +28,13 @@ class WP_Mail_Master
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Queue.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Error_Handler.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Exception.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Spam_Protection.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Admin.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Ajax.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Logs.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Settings.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Security.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Security_Logs.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Error_Logs.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Templates.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Template_Manager.php';
@@ -49,11 +52,14 @@ class WP_Mail_Master
     {
         $plugin_admin = new WP_Mail_Master_Admin($this->get_plugin_name(), $this->get_version());
         $plugin_settings = new WP_Mail_Master_Settings($this->get_plugin_name(), $this->get_version());
+        $plugin_security = new WP_Mail_Master_Security($this->get_plugin_name(), $this->get_version());
+        $plugin_security_logs = new WP_Mail_Master_Security_Logs($this->get_plugin_name(), $this->get_version());
         $error_logs = new WP_Mail_Master_Error_Logs();
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_assets');
         $this->loader->add_action('admin_menu', $plugin_admin, 'add_plugin_admin_menu');
         $this->loader->add_action('admin_init', $plugin_settings, 'register_settings');
+        $this->loader->add_action('admin_init', $plugin_security, 'register_settings');
         
         // Add error logs handlers
         $this->loader->add_action('admin_post_delete_error_log', $error_logs, 'handle_error_log_deletion');
@@ -62,25 +68,105 @@ class WP_Mail_Master
 
     private function define_email_hooks()
     {
-        $this->loader->add_filter('wp_mail', $this, 'override_wp_mail');
+        $this->loader->add_filter('pre_wp_mail', $this, 'override_wp_mail', 999999, 5);
     }
 
-    public function override_wp_mail($atts)
+    public function override_wp_mail($pre_wp_mail, $to, $subject = '', $message = '', $headers = '', $attachments = array())
     {
-        $emailer = new WP_Mail_Master_Emailer();
+        try {
+            error_log('WP Mail Master - Starting wp_mail override');
+            
+            if ($pre_wp_mail !== null) {
+                error_log('WP Mail Master - Email already handled by another plugin');
+                return $pre_wp_mail;
+            }
 
-        // Extract the wp_mail attributes
-        $to = $atts['to'];
-        $subject = $atts['subject'];
-        $message = $atts['message'];
-        $headers = isset($atts['headers']) ? $atts['headers'] : array();
-        $headers[] = 'Content-Type: text/html; charset=UTF-8';
-        $attachments = isset($atts['attachments']) ? $atts['attachments'] : array();
+            error_log('WP Mail Master - Initial arguments: ' . print_r([
+                'to' => $to,
+                'subject' => $subject,
+                'message' => substr($message, 0, 100) . '...', 
+                'headers' => $headers,
+                'attachments' => $attachments
+            ], true));
 
-        // Use the custom send_email method
-        return $emailer->send_email($to, $subject, $message, $headers, $attachments);
+            $emailer = new WP_Mail_Master_Emailer();
+
+            if (is_array($to)) {
+                error_log('WP Mail Master - Processing array input');
+                if (isset($to['to'])) {
+                    $args = $to;
+                } else {
+                    $args = array(
+                        'to' => $to,
+                        'subject' => $subject,
+                        'message' => $message,
+                        'headers' => $headers,
+                        'attachments' => $attachments
+                    );
+                }
+                
+                $to = $args['to'];
+                $subject = $args['subject'];
+                $message = $args['message'];
+                $headers = $args['headers'];
+                $attachments = $args['attachments'];
+            }
+
+            if (!is_array($headers)) {
+                $headers = explode("\n", str_replace("\r\n", "\n", $headers));
+            }
+            error_log('WP Mail Master - Normalized headers: ' . print_r($headers, true));
+
+            if (!is_array($attachments)) {
+                $attachments = explode("\n", str_replace("\r\n", "\n", $attachments));
+            }
+            error_log('WP Mail Master - Normalized attachments: ' . print_r($attachments, true));
+
+            error_log('WP Mail Master - Calling send_email');
+            $result = $emailer->send_email($to, $subject, $message, $headers, $attachments);
+            
+            error_log('WP Mail Master - Send result: ' . var_export($result, true));
+            
+            return true;
+
+        } catch (\Exception $e) {
+            error_log('WP Mail Master - wp_mail override error: ' . $e->getMessage());
+            error_log('WP Mail Master - Error trace: ' . $e->getTraceAsString());
+            return false;
+        }
     }
 
+    public function enqueue_scripts() {
+        // Enqueue existing scripts
+        wp_enqueue_script(
+            'wp-mail-master-admin',
+            plugin_dir_url(WP_MAIL_MASTER_PLUGIN_FILE) . 'assets/js/wp-mail-master-admin.js',
+            array('jquery'),
+            WP_MAIL_MASTER_VERSION,
+            true
+        );
+
+        // Enqueue honeypot script for all pages (not just admin)
+        wp_enqueue_script(
+            'wp-mail-master-honeypot',
+            plugin_dir_url(WP_MAIL_MASTER_PLUGIN_FILE) . 'assets/js/wp-mail-master-honeypot.js',
+            array('jquery'),
+            WP_MAIL_MASTER_VERSION,
+            true
+        );
+
+        // Add honeypot CSS
+        wp_add_inline_style(
+            'wp-mail-master-admin',
+            '.wp-mail-master-hp { position: absolute !important; visibility: hidden !important; }'
+        );
+
+        // Localize script
+        wp_localize_script('wp-mail-master-admin', 'wp_mail_master', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('wp_mail_master_nonce')
+        ));
+    }
 
     public function run()
     {

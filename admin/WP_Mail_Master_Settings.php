@@ -46,7 +46,52 @@ class WP_Mail_Master_Settings {
     }
 
     public function register_settings() {
-        register_setting('wp_mail_master_settings', 'wp_mail_master_options');
+        register_setting(
+            'wp_mail_master_options',
+            'wp_mail_master_options',
+            array($this, 'sanitize_settings')
+        );
+
+        // Add Spam Protection section
+        add_settings_section(
+            'wp_mail_master_spam_protection',
+            __('Spam Protection Settings', 'wp-mail-master'),
+            array($this, 'spam_protection_section_callback'),
+            'wp_mail_master'
+        );
+
+        // Add spam protection fields
+        add_settings_field(
+            'hourly_rate_limit',
+            __('Hourly Rate Limit', 'wp-mail-master'),
+            array($this, 'hourly_rate_limit_callback'),
+            'wp_mail_master',
+            'wp_mail_master_spam_protection'
+        );
+
+        add_settings_field(
+            'daily_email_limit',
+            __('Daily Email Limit', 'wp-mail-master'),
+            array($this, 'daily_email_limit_callback'),
+            'wp_mail_master',
+            'wp_mail_master_spam_protection'
+        );
+
+        add_settings_field(
+            'enable_ip_reputation_check',
+            __('IP Reputation Check', 'wp-mail-master'),
+            array($this, 'enable_ip_reputation_check_callback'),
+            'wp_mail_master',
+            'wp_mail_master_spam_protection'
+        );
+
+        add_settings_field(
+            'spam_keywords',
+            __('Spam Keywords', 'wp-mail-master'),
+            array($this, 'spam_keywords_callback'),
+            'wp_mail_master',
+            'wp_mail_master_spam_protection'
+        );
 
         add_settings_section(
             'wp_mail_master_general_section',
@@ -512,6 +557,71 @@ class WP_Mail_Master_Settings {
         <?php
     }
 
+    public function spam_protection_section_callback() {
+        echo '<p>' . __('Configure spam protection settings to prevent abuse.', 'wp-mail-master') . '</p>';
+    }
+
+    public function hourly_rate_limit_callback() {
+        $options = get_option('wp_mail_master_options');
+        $value = isset($options['hourly_rate_limit']) ? $options['hourly_rate_limit'] : 50;
+        ?>
+        <input type="number" 
+               name="wp_mail_master_options[hourly_rate_limit]" 
+               value="<?php echo esc_attr($value); ?>" 
+               min="1" 
+               max="1000" />
+        <p class="description">
+            <?php _e('Maximum number of emails allowed per hour from the same IP address.', 'wp-mail-master'); ?>
+        </p>
+        <?php
+    }
+
+    public function daily_email_limit_callback() {
+        $options = get_option('wp_mail_master_options');
+        $value = isset($options['daily_email_limit']) ? $options['daily_email_limit'] : 100;
+        ?>
+        <input type="number" 
+               name="wp_mail_master_options[daily_email_limit]" 
+               value="<?php echo esc_attr($value); ?>" 
+               min="1" 
+               max="5000" />
+        <p class="description">
+            <?php _e('Maximum number of emails allowed per day to the same email address.', 'wp-mail-master'); ?>
+        </p>
+        <?php
+    }
+
+    public function enable_ip_reputation_check_callback() {
+        $options = get_option('wp_mail_master_options');
+        $checked = isset($options['enable_ip_reputation_check']) ? $options['enable_ip_reputation_check'] : 0;
+        ?>
+        <label>
+            <input type="checkbox" 
+                   name="wp_mail_master_options[enable_ip_reputation_check]" 
+                   value="1" 
+                   <?php checked(1, $checked); ?> />
+            <?php _e('Enable IP reputation checking', 'wp-mail-master'); ?>
+        </label>
+        <p class="description">
+            <?php _e('Check sender IP reputation against known spam sources.', 'wp-mail-master'); ?>
+        </p>
+        <?php
+    }
+
+    public function spam_keywords_callback() {
+        $keywords = get_option('wp_mail_master_spam_keywords', array());
+        ?>
+        <textarea name="wp_mail_master_spam_keywords" 
+                  rows="5" 
+                  cols="50"
+                  placeholder="<?php _e('Enter keywords separated by commas', 'wp-mail-master'); ?>"
+        ><?php echo esc_textarea(implode(', ', $keywords)); ?></textarea>
+        <p class="description">
+            <?php _e('Add custom spam keywords (comma-separated). These will be combined with default spam keywords.', 'wp-mail-master'); ?>
+        </p>
+        <?php
+    }
+
     /**
      * Comprehensive settings sanitization
      */
@@ -587,6 +697,27 @@ class WP_Mail_Master_Settings {
             sanitize_text_field($input['mailjet_api_key']) : '';
         $sanitized['mailjet_secret_key'] = isset($input['mailjet_secret_key']) ? 
             sanitize_text_field($input['mailjet_secret_key']) : '';
+
+        // Sanitize spam protection settings
+        $sanitized['hourly_rate_limit'] = isset($input['hourly_rate_limit']) 
+            ? absint($input['hourly_rate_limit']) 
+            : 50;
+            
+        $sanitized['daily_email_limit'] = isset($input['daily_email_limit']) 
+            ? absint($input['daily_email_limit']) 
+            : 100;
+            
+        $sanitized['enable_ip_reputation_check'] = isset($input['enable_ip_reputation_check']) 
+            ? 1 
+            : 0;
+
+        // Sanitize and save spam keywords
+        if (isset($_POST['wp_mail_master_spam_keywords'])) {
+            $keywords = explode(',', sanitize_text_field($_POST['wp_mail_master_spam_keywords']));
+            $keywords = array_map('trim', $keywords);
+            $keywords = array_filter($keywords);
+            update_option('wp_mail_master_spam_keywords', $keywords);
+        }
 
         return $sanitized;
     }

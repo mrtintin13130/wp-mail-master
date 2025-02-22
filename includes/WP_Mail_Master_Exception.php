@@ -33,6 +33,12 @@ class WP_Mail_Master_Exception extends \Exception
     const UNAUTHORIZED_ERROR = 501;
     const INSUFFICIENT_PRIVILEGES_ERROR = 502;
 
+    // Spam protection related error codes
+    const RATE_LIMIT_ERROR = 8;
+    const SPAM_CONTENT_ERROR = 9;
+    const IP_BLOCKED_ERROR = 10;
+    const SPAM_DETECTED_ERROR = 11;
+
     /** @var array */
     protected $context;
 
