@@ -20,42 +20,73 @@ class WP_Mail_Master_Dashboard_Widget
         );
     }
 
-    public function enqueue_dashboard_scripts()
+    public function enqueue_dashboard_scripts($hook)
     {
+        // Only load on dashboard page
+        if ('index.php' !== $hook) {
+            return;
+        }
+
         wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null, true);
         wp_enqueue_script('chartjs-adapter-date-fns', 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns', array('chart-js'), null, true);
 
         // Add custom CSS
         wp_add_inline_style('wp-admin', '
-            .wp-mail-master-widget-container {
-                background: #fff;
+            #dashboard-widgets #wp_mail_master_dashboard_widget .inside {
+                margin: 0;
+                padding: 0;
             }
-            .wp-mail-master-stats {
-                display: flex;
-                gap: 20px;
+            #dashboard-widgets .wp-mail-master-widget-container {
+                padding: 12px;
+                margin: 0;
+                position: relative;
+            }
+            #dashboard-widgets .wp-mail-master-stats {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 12px;
                 margin-bottom: 20px;
-                padding: 10px 0;
             }
-            .wp-mail-master-stat-box {
-                flex: 1;
+            #dashboard-widgets .wp-mail-master-stat-box {
                 padding: 15px;
                 border-radius: 6px;
-                background: #f8f9fa;
                 text-align: center;
+                transition: transform 0.2s ease;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             }
-            .wp-mail-master-stat-box h3 {
+            #dashboard-widgets .wp-mail-master-stat-box:hover {
+                transform: translateY(-2px);
+            }
+            #dashboard-widgets .wp-mail-master-stat-box h3 {
                 margin: 0 0 5px 0;
                 font-size: 24px;
                 font-weight: 600;
+                line-height: 1.2;
+                color: inherit;
             }
-            .wp-mail-master-stat-box p {
+            #dashboard-widgets .wp-mail-master-stat-box p {
                 margin: 0;
-                color: #666;
-                font-size: 14px;
+                font-size: 13px;
+                opacity: 0.9;
+                color: inherit;
             }
-            .wp-mail-master-chart-container {
+            #dashboard-widgets .wp-mail-master-stat-box.stat-success {
+                background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                color: white;
+            }
+            #dashboard-widgets .wp-mail-master-stat-box.stat-error {
+                background: linear-gradient(135deg, #F44336 0%, #e53935 100%);
+                color: white;
+            }
+            #dashboard-widgets .wp-mail-master-stat-box.stat-blocked {
+                background: linear-gradient(135deg, #FF9800 0%, #fb8c00 100%);
+                color: white;
+            }
+            #dashboard-widgets .wp-mail-master-chart-container {
                 position: relative;
                 height: 300px;
+                margin-top: 20px;
+                padding: 10px;
             }
         ');
     }
@@ -69,59 +100,88 @@ class WP_Mail_Master_Dashboard_Widget
         $table_name = $wpdb->prefix . 'wp_mail_master_logs';
 
         // Get total counts for the summary using a single query
-        $counts = $wpdb->get_results("
+        $counts = $wpdb->get_results($wpdb->prepare("
             SELECT status, COUNT(*) as count 
             FROM $table_name 
-            WHERE status IN ('success', 'error') 
+            WHERE status IN ('success', 'error', 'spam', 'blocked')
             GROUP BY status
-        ");
+        "));
 
         $total_sent = 0;
         $total_errors = 0;
-        foreach ($counts as $count) {
-            if ($count->status === 'success') {
-                $total_sent = $count->count;
-            } else if ($count->status === 'error') {
-                $total_errors = $count->count;
+        $total_blocked = 0; // Combined spam and blocked
+
+        if ($counts) {
+            foreach ($counts as $count) {
+                switch ($count->status) {
+                    case 'success':
+                        $total_sent = (int)$count->count;
+                        break;
+                    case 'error':
+                        $total_errors = (int)$count->count;
+                        break;
+                    case 'spam':
+                    case 'blocked':
+                        $total_blocked += (int)$count->count;
+                        break;
+                }
             }
         }
 
         // Create a date range for the last 30 days
-        $end_date = date('Y-m-d');
-        $start_date = date('Y-m-d', strtotime('-30 days'));
+        $end_date = current_time('Y-m-d 23:59:59');
+        $start_date = date('Y-m-d 00:00:00', strtotime('-30 days', strtotime($end_date)));
 
         // Get all data in a single query
         $logs = $wpdb->get_results($wpdb->prepare("
-            SELECT DATE(time) as log_date, 
+            SELECT 
+                DATE(created_at) as log_date,
                 SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as sent_count,
-                SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_count
+                SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_count,
+                SUM(CASE WHEN status IN ('spam', 'blocked') THEN 1 ELSE 0 END) as blocked_count
             FROM $table_name
-            WHERE DATE(time) BETWEEN %s AND %s
-            GROUP BY DATE(time)
+            WHERE created_at BETWEEN %s AND %s
+            GROUP BY DATE(created_at)
             ORDER BY log_date ASC
         ", $start_date, $end_date));
 
-        // Prepare data arrays
+        // Initialize arrays with dates as keys
         $dates = array();
-        $sent_data = array();
-        $error_data = array();
+        $data_by_date = array();
 
-        // Generate date range and fill with data
-        $current_date = $start_date;
-        while (strtotime($current_date) <= strtotime($end_date)) {
-            $dates[] = $current_date;
-            $sent_data[] = 0;
-            $error_data[] = 0;
-            $current_date = date('Y-m-d', strtotime($current_date . ' +1 day'));
+        // Generate the last 30 days dates and initialize data structure
+        for ($i = 30; $i >= 0; $i--) {
+            $date = date('Y-m-d', strtotime("-$i days"));
+            $dates[] = $date;
+            $data_by_date[$date] = array(
+                'sent' => 0,
+                'error' => 0,
+                'blocked' => 0
+            );
         }
 
-        // Fill in actual data
-        foreach ($logs as $log) {
-            $index = array_search($log->log_date, $dates);
-            if ($index !== false) {
-                $sent_data[$index] = (int) $log->sent_count;
-                $error_data[$index] = (int) $log->error_count;
+        // Fill in the actual data
+        if ($logs) {
+            foreach ($logs as $log) {
+                if (isset($data_by_date[$log->log_date])) {
+                    $data_by_date[$log->log_date] = array(
+                        'sent' => (int)$log->sent_count,
+                        'error' => (int)$log->error_count,
+                        'blocked' => (int)$log->blocked_count
+                    );
+                }
             }
+        }
+
+        // Convert data structure to arrays for the chart
+        $sent_data = array();
+        $error_data = array();
+        $blocked_data = array();
+
+        foreach ($dates as $date) {
+            $sent_data[] = $data_by_date[$date]['sent'];
+            $error_data[] = $data_by_date[$date]['error'];
+            $blocked_data[] = $data_by_date[$date]['blocked'];
         }
 
         // Include the view file

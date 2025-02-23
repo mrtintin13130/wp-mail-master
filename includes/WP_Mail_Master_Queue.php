@@ -7,8 +7,14 @@ class WP_Mail_Master_Queue
 {
     const QUEUE_TABLE = 'wp_mail_master_queue';
 
-    public function __construct()
+    private $plugin_name;
+    private $version;
+
+    public function __construct($plugin_name, $version)
     {
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
+
         add_action('wp_mail_master_process_queue', array($this, 'process_queue'));
 
         if (!wp_next_scheduled('wp_mail_master_process_queue')) {
@@ -60,8 +66,9 @@ class WP_Mail_Master_Queue
             return;
         }
 
+        $emailer = new WP_Mail_Master_Emailer($this->plugin_name, $this->version);
+
         foreach ($emails as $email) {
-            $emailer = new WP_Mail_Master_Emailer();
             $result = $emailer->send_email(
                 $email->to_email,
                 $email->subject,
@@ -85,7 +92,7 @@ class WP_Mail_Master_Queue
             }
         }
     }
-    public static function create_queue_table()
+    public function create_queue_table()
     {
         global $wpdb;
         if (!$wpdb) {
@@ -106,7 +113,7 @@ class WP_Mail_Master_Queue
             last_attempt datetime DEFAULT NULL,
             attempts int(11) NOT NULL DEFAULT 0,
             PRIMARY KEY  (id),
-            KEY idx_status_attempts (status, attempts),
+            KEY idx_status (status),
             KEY idx_created_at (created_at)
         ) $charset_collate;";
 

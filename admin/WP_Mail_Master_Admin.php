@@ -8,9 +8,9 @@ class WP_Mail_Master_Admin
 {
     private $plugin_name;
     private $version;
-    private $logs_instance;
     private $settings_instance;
     private $templates_instance;
+    private $logs_instance;
 
     /**
      * Initialize the class and set its properties.
@@ -24,12 +24,12 @@ class WP_Mail_Master_Admin
         $this->version = $version;
 
         // Initialize instances
-        $this->logs_instance = new WP_Mail_Master_Logs();
         $this->settings_instance = new WP_Mail_Master_Settings($this->plugin_name, $this->version);
         $this->templates_instance = new WP_Mail_Master_Templates();
+        $this->logs_instance = new WP_Mail_Master_Logs($this->plugin_name, $this->version, true);
 
         // Initialize AJAX handler
-        new WP_Mail_Master_Ajax();
+        new WP_Mail_Master_Ajax($this->plugin_name, $this->version);
 
         // Add menu items
         add_action('admin_menu', array($this, 'add_plugin_admin_menu'));
@@ -56,94 +56,55 @@ class WP_Mail_Master_Admin
             return;
         }
 
-        // Enqueue main CSS file
+        // Enqueue styles
         wp_enqueue_style(
             $this->plugin_name,
-            $this->get_asset_url('css/wp-mail-master-admin.css'),
+            plugin_dir_url(dirname(__FILE__)) . 'admin/css/wp-mail-master-admin.css',
             array(),
             $this->version,
             'all'
         );
 
-        // Only load Chart.js on dashboard
-        if ($hook === 'index.php') {
-            wp_enqueue_script(
-                'chart-js',
-                'https://cdn.jsdelivr.net/npm/chart.js',
-                array(),
-                $this->version,
-                true
-            );
-            wp_enqueue_script(
-                'chartjs-adapter-date-fns',
-                'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns',
-                array('chart-js'),
-                $this->version,
-                true
-            );
-        }
+        // Enqueue scripts
+        wp_enqueue_script(
+            $this->plugin_name,
+            plugin_dir_url(dirname(__FILE__)) . 'admin/js/wp-mail-master-admin.js',
+            array('jquery'),
+            $this->version,
+            false
+        );
 
-        // Load wp-mail-master-admin.js on the settings page
-        if ($hook === 'toplevel_page_' . $this->plugin_name) {
-            wp_enqueue_script(
-                $this->plugin_name . '-admin',
-                $this->get_asset_url('js/wp-mail-master-admin.js'),
-                array('jquery'),
-                $this->version,
-                true
-            );
-
-            wp_localize_script(
-                $this->plugin_name . '-admin',
-                'wp_mail_master',
-                array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    'nonce' => wp_create_nonce('send_test_email_nonce'),
-                    'i18n' => array(
-                        'confirmDelete' => __('Are you sure you want to delete this?', 'wp-mail-master'),
-                        'testEmailSuccess' => __('Test email sent successfully.', 'wp-mail-master'),
-                        'testEmailError' => __('Failed to send test email.', 'wp-mail-master')
-                    )
+        // Localize script
+        wp_localize_script(
+            $this->plugin_name,
+            'wpMailMasterAdmin',
+            array(
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('wp_mail_master_nonce'),
+                'i18n' => array(
+                    'confirmDelete' => __('Are you sure you want to delete this item?', 'wp-mail-master'),
+                    'error' => __('An error occurred. Please try again.', 'wp-mail-master'),
+                    'success' => __('Operation completed successfully.', 'wp-mail-master')
                 )
-            );
-        }
+            )
+        );
+    }
 
-        // Load templates.js only on the templates page
-        if ($hook === $this->plugin_name . '_page_wp-mail-master-templates') {
-            // Load required WordPress scripts
-            wp_enqueue_media();
-            wp_enqueue_editor();
-            wp_enqueue_style('wp-color-picker');
+    /**
+     * Check if current page is a plugin page
+     *
+     * @param string $hook The current admin page hook
+     * @return bool
+     */
+    private function is_plugin_page($hook)
+    {
+        $plugin_pages = array(
+            'toplevel_page_' . $this->plugin_name,
+            $this->plugin_name . '_page_wp-mail-master-logs',
+            $this->plugin_name . '_page_wp-mail-master-templates'
+        );
 
-            wp_enqueue_script(
-                $this->plugin_name . '-templates',
-                $this->get_asset_url('js/templates.js'),
-                array('jquery', 'wp-color-picker', 'jquery-ui-sortable', 'wp-editor'),
-                $this->version,
-                true
-            );
-
-            wp_localize_script(
-                $this->plugin_name . '-templates',
-                'wpMailMasterTemplates',
-                array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    'nonce' => wp_create_nonce('template_nonce'),
-                    'site_name' => get_bloginfo('name'),
-                    'site_url' => get_bloginfo('url'),
-                    'available_vars' => $this->templates_instance->get_available_variables(),
-                    'i18n' => array(
-                        'enterTestEmail' => __('Enter email address for test:', 'wp-mail-master'),
-                        'testEmailSent' => __('Test email sent successfully!', 'wp-mail-master'),
-                        'testEmailError' => __('Failed to send test email.', 'wp-mail-master'),
-                        'confirmDelete' => __('Are you sure you want to delete this template?', 'wp-mail-master'),
-                        'selectImage' => __('Select Image', 'wp-mail-master'),
-                        'insertImage' => __('Insert Image', 'wp-mail-master'),
-                        'deleteError' => __('Failed to delete template.', 'wp-mail-master')
-                    )
-                )
-            );
-        }
+        return in_array($hook, $plugin_pages);
     }
 
     /**
@@ -162,26 +123,17 @@ class WP_Mail_Master_Admin
             85
         );
 
-        // Add submenu for email logs
+        // Add logs submenu
         add_submenu_page(
             $this->plugin_name,
-            __('Email Logs', 'wp-mail-master'),
-            __('Email Logs', 'wp-mail-master'),
+            __('Logs', 'wp-mail-master'),
+            __('Logs', 'wp-mail-master'),
             'manage_options',
-            'wp-mail-master-email-logs',
-            array($this->logs_instance, 'display_email_logs_page')
+            'wp-mail-master-logs',
+            array($this->logs_instance, 'display_logs_page')
         );
 
-        // Add Error Logs submenu
-        add_submenu_page(
-            $this->plugin_name,
-            __('Error Logs', 'wp-mail-master'),
-            __('Error Logs', 'wp-mail-master'),
-            'manage_options',
-            'wp-mail-master-error-logs',
-            array(new WP_Mail_Master_Error_Logs(), 'display_error_logs_page')
-        );
-
+        // Add templates submenu
         add_submenu_page(
             $this->plugin_name,
             __('Email Templates', 'wp-mail-master'),
@@ -252,60 +204,20 @@ class WP_Mail_Master_Admin
                 'success'
             );
         }
-
-        // Display notice if logs were deleted
-        if (isset($_GET['deleted']) && $_GET['deleted']) {
-            $this->display_notice(
-                __('Log entry deleted successfully.', 'wp-mail-master'),
-                'success'
-            );
-        }
     }
 
     /**
-     * Check if current page is a plugin page
-     *
-     * @param string $hook The current admin page hook
-     * @return boolean
-     */
-    private function is_plugin_page($hook)
-    {
-        $plugin_pages = array(
-            'toplevel_page_' . $this->plugin_name,
-            $this->plugin_name . '_page_wp-mail-master-email-logs'
-        );
-
-        return in_array($hook, $plugin_pages);
-    }
-
-    /**
-     * Get the URL for an asset file
-     *
-     * @param string $file The asset file path
-     * @return string The full URL to the asset
-     */
-    private function get_asset_url($file)
-    {
-        // Check if debug mode is enabled
-        if (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) {
-            $file = str_replace('.min', '', $file);
-        }
-
-        return WP_MAIL_MASTER_PLUGIN_URL . 'admin/' . $file;
-    }
-
-    /**
-     * Display an admin notice
+     * Display a notice
      *
      * @param string $message The notice message
      * @param string $type The notice type (success, error, warning, info)
      */
-    private function display_notice($message, $type = 'success')
+    private function display_notice($message, $type = 'info')
     {
-        printf(
-            '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
-            esc_attr($type),
-            esc_html($message)
-        );
+        ?>
+        <div class="notice notice-<?php echo esc_attr($type); ?> is-dismissible">
+            <p><?php echo esc_html($message); ?></p>
+        </div>
+        <?php
     }
 }

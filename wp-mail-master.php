@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: WP Mail Master
- * Plugin URI: https://example.com/wp-mail-master
+ * Plugin URI: https://www.linkedin.com/in/martho/
  * Description: A fully featured email plugin for WordPress with API and SMTP support, email logging, and more.
  * Version: 1.1.0
  * Author: Martho
- * Author URI: https://example.com
+ * Author URI: https://www.linkedin.com/in/martho/
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  * Requires at least: 6.0
@@ -21,7 +21,7 @@ if (!defined('WPINC')) {
     die;
 }
 
-define('WP_MAIL_MASTER_VERSION', '1.0.0');
+define('WP_MAIL_MASTER_VERSION', '1.1.0');
 define('WP_MAIL_MASTER_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_MAIL_MASTER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WP_MAIL_MASTER_PLUGIN_FILE', __FILE__);
@@ -57,7 +57,8 @@ register_activation_hook(__FILE__, function () {
     
     // Create queue table if you're using it
     if (class_exists('WP_Mail_Master_Queue')) {
-        WP_Mail_Master_Queue::create_queue_table();
+        $queue = new WP_Mail_Master_Queue('wp-mail-master', WP_MAIL_MASTER_VERSION);
+        $queue->create_queue_table();
     }
 });
 

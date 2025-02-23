@@ -6,8 +6,13 @@ namespace Martho\WpMailMaster;
 
 class WP_Mail_Master_Ajax
 {
-    public function __construct()
+    private $plugin_name;
+    private $version;
+
+    public function __construct($plugin_name, $version)
     {
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
         add_action('wp_ajax_send_test_email', array($this, 'send_test_email'));
         add_action('wp_ajax_save_template', array($this, 'ajax_save_template'));
         add_action('wp_ajax_delete_template', array($this, 'ajax_delete_template'));
@@ -40,7 +45,7 @@ class WP_Mail_Master_Ajax
             $this->check_rate_limit();
 
             // Send the test email
-            $emailer = new WP_Mail_Master_Emailer();
+            $emailer = new WP_Mail_Master_Emailer($this->plugin_name, $this->version);
             $result = $emailer->send_test_email($email_address);
 
             if (!$result) {

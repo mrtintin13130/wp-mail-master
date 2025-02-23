@@ -11,9 +11,15 @@ class WP_Mail_Master_Emailer
     private $service;
     private $templates;
     private $spam_protection;
+    private $settings;
+    private $plugin_name;
+    private $version;
 
-    public function __construct()
+    public function __construct($plugin_name, $version)
     {
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
+        $this->settings = new WP_Mail_Master_Settings($plugin_name, $version);
         $options = get_option('wp_mail_master_options', []);
         $service_type = isset($options['email_service']) ? $options['email_service'] : 'smtp';
         $this->service = EmailServiceFactory::create($service_type, $options);
@@ -62,7 +68,7 @@ class WP_Mail_Master_Emailer
             } catch (WP_Mail_Master_Exception $e) {
                 $error_info = 'Spam protection: ' . $e->getMessage();
                 $this->log_email(implode(',', $valid_emails), $subject, $message, 'blocked', $error_info);
-                throw $e;
+                return false;
             }
             
             // If no template_id is provided, use the selected template
@@ -169,16 +175,24 @@ class WP_Mail_Master_Emailer
             return;
         }
 
-        $table_name = $wpdb->prefix . 'wp_mail_master_logs';
-        
         // Handle array input for $to
         if (is_array($to)) {
             $to = implode(',', $to);
         }
 
-        // Ensure message is a string
-        if (is_array($message)) {
-            $message = wp_json_encode($message);
+        // Create a summary of the message instead of storing the full HTML
+        if (is_string($message)) {
+            // Strip HTML tags
+            $stripped_message = wp_strip_all_tags($message);
+            // Get first 150 characters
+            $message_summary = substr($stripped_message, 0, 150);
+            if (strlen($stripped_message) > 150) {
+                $message_summary .= '...';
+            }
+        } else if (is_array($message)) {
+            $message_summary = 'Array message data';
+        } else {
+            $message_summary = 'Invalid message format';
         }
 
         // Add debug log
@@ -190,26 +204,52 @@ class WP_Mail_Master_Emailer
             $error_info ?? 'none'
         ));
 
-        $data = array(
-            'time' => current_time('mysql'),
+        // Map old statuses to new ones with better clarity
+        $status_map = [
+            'sent' => 'success',
+            'failed' => 'error',
+            'blocked' => 'blocked',  // Changed from 'warning' to 'blocked'
+            'success' => 'success',
+            'error' => 'error'
+        ];
+        $mapped_status = isset($status_map[$status]) ? $status_map[$status] : $status;
+
+        // Store the full message in metadata for reference
+        $metadata = [
             'to_email' => $to,
             'subject' => $subject,
-            'message' => $message,
-            'status' => $status,
-            'error_info' => $error_info
-        );
+            'full_message' => $message,
+            'status_details' => [
+                'original_status' => $status,
+                'mapped_status' => $mapped_status,
+                'timestamp' => current_time('mysql')
+            ]
+        ];
 
-        // Ensure data types are correct
-        $data = array_map(function($value) {
-            if (is_null($value)) return null;
-            return (string)$value;
-        }, $data);
-
-        $result = $wpdb->insert($table_name, $data);
-        
-        if ($result === false) {
-            error_log("WP Mail Master - Failed to log email: " . $wpdb->last_error);
+        if ($error_info) {
+            $metadata['error_info'] = $error_info;
         }
+
+        // Get logs instance
+        $logs = new WP_Mail_Master_Logs($this->plugin_name, $this->version, false);
+
+        // Determine level based on status
+        $level = match($mapped_status) {
+            'success' => 'info',
+            'error' => 'error',
+            'blocked' => 'warning',
+            default => 'info'
+        };
+
+        // Log with new system using the summary as the main message
+        $logs->log(
+            'email',
+            $level,
+            $mapped_status,
+            $message_summary,
+            null,
+            $metadata
+        );
     }
     public function send_test_email($to)
     {
@@ -219,5 +259,76 @@ class WP_Mail_Master_Emailer
                   '<p>If you are reading this message, it means the email was delivered successfully and the plugin is working correctly.</p>' .
                   '<p>You can now use WP Mail Master to send emails from your WordPress site with confidence.</p>';
         return $this->send_email($to, $subject, $message);
+    }
+
+    public function override_wp_mail($null, $to = '', $subject = '', $message = '', $headers = '', $attachments = array())
+    {
+        try {
+            error_log('WP Mail Master - Mail parameters received:');
+            error_log('To: ' . print_r($to, true));
+            error_log('Subject: ' . print_r($subject, true));
+            error_log('Headers: ' . print_r($headers, true));
+
+            // Handle case where all parameters are passed as a single array
+            if (is_array($to) && isset($to['to'])) {
+                $email_data = $to;
+                $to = $email_data['to'];
+                $subject = $email_data['subject'];
+                $message = $email_data['message'];
+                $headers = $email_data['headers'];
+                $attachments = isset($email_data['attachments']) ? $email_data['attachments'] : array();
+            }
+
+            // Handle case where 'to' is an array of email addresses
+            if (is_array($to) && isset($to[0])) {
+                $to = $to[0]; // Take the first email address
+            }
+
+            // Ensure we have required fields
+            if (empty($to)) {
+                error_log('WP Mail Master - No recipient specified');
+                return null;
+            }
+
+            // Send email using our service
+            $result = $this->send_email($to, $subject, $message, $headers, $attachments);
+            
+            // Return true if successful (prevents WordPress from sending), null if failed (lets WordPress try)
+            return $result ? true : null;
+
+        } catch (\Exception $e) {
+            error_log('WP Mail Master - Error: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function handle_wp_mail_failed($wp_error)
+    {
+        if (!($wp_error instanceof \WP_Error)) {
+            return;
+        }
+
+        $error_data = $wp_error->get_error_data();
+        
+        // Extract email details from error data
+        $to = isset($error_data['to']) ? $error_data['to'] : '';
+        $subject = isset($error_data['subject']) ? $error_data['subject'] : '';
+        $message = isset($error_data['message']) ? $error_data['message'] : '';
+        
+        // Get error message
+        $error_message = $wp_error->get_error_message();
+        
+        error_log('WP Mail Master - Mail failure: ' . $error_message);
+        
+        // Log the failure
+        $this->log_email(
+            $to,
+            $subject,
+            $message,
+            'failed',
+            $error_message
+        );
+        
+        do_action('wp_mail_master_send_error', $wp_error);
     }
 }

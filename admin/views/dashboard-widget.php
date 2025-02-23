@@ -4,51 +4,78 @@ if (!defined('WPINC')) {
     die;
 }
 
-// Ensure required variables are passed
-if (
-    !isset($dates) || !isset($sent_data) || !isset($error_data) ||
-    !isset($total_sent) || !isset($total_errors)
-) {
-    return;
-}
+// Initialize variables with defaults
+$total_sent = $total_sent ?? 0;
+$total_errors = $total_errors ?? 0;
+$total_blocked = $total_blocked ?? 0;
+$dates = $dates ?? array();
+$sent_data = $sent_data ?? array();
+$error_data = $error_data ?? array();
+$blocked_data = $blocked_data ?? array();
+
+// Generate a unique ID for the chart
+$chart_id = 'wp-mail-master-chart-' . wp_rand();
 ?>
 <div class="wp-mail-master-widget-container">
     <div class="wp-mail-master-stats">
-        <div class="wp-mail-master-stat-box">
-            <h3><?php echo number_format($total_sent); ?></h3>
-            <p><?php _e('Total Emails Sent', 'wp-mail-master'); ?></p>
+        <div class="wp-mail-master-stat-box stat-success">
+            <h3><?php echo esc_html(number_format($total_sent)); ?></h3>
+            <p><?php esc_html_e('Emails Sent', 'wp-mail-master'); ?></p>
         </div>
-        <div class="wp-mail-master-stat-box">
-            <h3><?php echo number_format($total_errors); ?></h3>
-            <p><?php _e('Total Errors', 'wp-mail-master'); ?></p>
+        <div class="wp-mail-master-stat-box stat-error">
+            <h3><?php echo esc_html(number_format($total_errors)); ?></h3>
+            <p><?php esc_html_e('Errors', 'wp-mail-master'); ?></p>
+        </div>
+        <div class="wp-mail-master-stat-box stat-blocked">
+            <h3><?php echo esc_html(number_format($total_blocked)); ?></h3>
+            <p><?php esc_html_e('Blocked/Spam', 'wp-mail-master'); ?></p>
         </div>
     </div>
     <div class="wp-mail-master-chart-container">
-        <canvas id="wp-mail-master-chart"></canvas>
+        <canvas id="<?php echo esc_attr($chart_id); ?>"></canvas>
     </div>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var ctx = document.getElementById('wp-mail-master-chart').getContext('2d');
+    jQuery(document).ready(function($) {
+        var ctx = document.getElementById('<?php echo esc_js($chart_id); ?>').getContext('2d');
+        
+        // Format dates and prepare data points
+        var chartData = [];
+        <?php
+        // Format the data for output
+        foreach ($dates as $index => $date) {
+            $formatted_date = date('M j', strtotime($date));
+            echo "chartData.push({
+                date: '" . esc_js($formatted_date) . "',
+                sent: " . (int)$sent_data[$index] . ",
+                error: " . (int)$error_data[$index] . ",
+                blocked: " . (int)$blocked_data[$index] . "
+            });\n";
+        }
+        ?>
 
-        // Custom gradient for the sent emails line
+        // Custom gradients
         var sentGradient = ctx.createLinearGradient(0, 0, 0, 400);
         sentGradient.addColorStop(0, 'rgba(76, 175, 80, 0.4)');
         sentGradient.addColorStop(1, 'rgba(76, 175, 80, 0)');
 
-        // Custom gradient for the errors line
         var errorGradient = ctx.createLinearGradient(0, 0, 0, 400);
         errorGradient.addColorStop(0, 'rgba(244, 67, 54, 0.4)');
         errorGradient.addColorStop(1, 'rgba(244, 67, 54, 0)');
 
-        var chart = new Chart(ctx, {
+        var blockedGradient = ctx.createLinearGradient(0, 0, 0, 400);
+        blockedGradient.addColorStop(0, 'rgba(255, 152, 0, 0.4)');
+        blockedGradient.addColorStop(1, 'rgba(255, 152, 0, 0)');
+
+        // Create the chart
+        new Chart(ctx, {
             type: 'line',
             data: {
-                labels: <?php echo json_encode($dates); ?>,
+                labels: chartData.map(item => item.date),
                 datasets: [
                     {
-                        label: 'Sent Emails',
-                        data: <?php echo json_encode($sent_data); ?>,
+                        label: '<?php esc_html_e('Sent Emails', 'wp-mail-master'); ?>',
+                        data: chartData.map(item => item.sent),
                         borderColor: '#4CAF50',
                         backgroundColor: sentGradient,
                         borderWidth: 2,
@@ -61,8 +88,8 @@ if (
                         pointBorderWidth: 2
                     },
                     {
-                        label: 'Errors',
-                        data: <?php echo json_encode($error_data); ?>,
+                        label: '<?php esc_html_e('Errors', 'wp-mail-master'); ?>',
+                        data: chartData.map(item => item.error),
                         borderColor: '#F44336',
                         backgroundColor: errorGradient,
                         borderWidth: 2,
@@ -72,6 +99,20 @@ if (
                         pointHoverRadius: 6,
                         pointBackgroundColor: '#fff',
                         pointBorderColor: '#F44336',
+                        pointBorderWidth: 2
+                    },
+                    {
+                        label: '<?php esc_html_e('Blocked/Spam', 'wp-mail-master'); ?>',
+                        data: chartData.map(item => item.blocked),
+                        borderColor: '#FF9800',
+                        backgroundColor: blockedGradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#FF9800',
                         pointBorderWidth: 2
                     }
                 ]
@@ -102,34 +143,18 @@ if (
                         borderWidth: 1,
                         padding: 12,
                         boxPadding: 6,
-                        usePointStyle: true,
-                        callbacks: {
-                            title: function (context) {
-                                return new Date(context[0].label).toLocaleDateString(undefined, {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                });
-                            }
-                        }
+                        usePointStyle: true
                     }
                 },
                 scales: {
                     x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day',
-                            tooltipFormat: 'MMM dd, yyyy',
-                            displayFormats: {
-                                day: 'MMM dd'
-                            }
-                        },
                         grid: {
                             display: false
                         },
-                        border: {
-                            display: true
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 10
                         }
                     },
                     y: {

@@ -31,13 +31,11 @@ class WP_Mail_Master
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Spam_Protection.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Admin.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Ajax.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Logs.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Settings.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Security.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Security_Logs.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Error_Logs.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Templates.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Template_Manager.php';
+        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'admin/WP_Mail_Master_Logs.php';
 
         $this->loader = new WP_Mail_Master_Loader();
     }
@@ -50,25 +48,21 @@ class WP_Mail_Master
 
     private function define_admin_hooks()
     {
-        $plugin_admin = new WP_Mail_Master_Admin($this->get_plugin_name(), $this->get_version());
-        $plugin_settings = new WP_Mail_Master_Settings($this->get_plugin_name(), $this->get_version());
-        $plugin_security = new WP_Mail_Master_Security($this->get_plugin_name(), $this->get_version());
-        $plugin_security_logs = new WP_Mail_Master_Security_Logs($this->get_plugin_name(), $this->get_version());
-        $error_logs = new WP_Mail_Master_Error_Logs();
+        $plugin_admin = new WP_Mail_Master_Admin($this->plugin_name, $this->version);
+        $plugin_settings = new WP_Mail_Master_Settings($this->plugin_name, $this->version);
+        $plugin_security = new WP_Mail_Master_Security($this->plugin_name, $this->version);
+        $emailer = new WP_Mail_Master_Emailer($this->plugin_name, $this->version);
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_assets');
         $this->loader->add_action('admin_menu', $plugin_admin, 'add_plugin_admin_menu');
         $this->loader->add_action('admin_init', $plugin_settings, 'register_settings');
         $this->loader->add_action('admin_init', $plugin_security, 'register_settings');
-        
-        // Add error logs handlers
-        $this->loader->add_action('admin_post_delete_error_log', $error_logs, 'handle_error_log_deletion');
-        $this->loader->add_action('admin_post_clear_error_logs', $error_logs, 'handle_clear_error_logs');
     }
 
     private function define_email_hooks()
     {
-        $this->loader->add_filter('pre_wp_mail', $this, 'override_wp_mail', 999999, 5);
+        $emailer = new WP_Mail_Master_Emailer($this->plugin_name, $this->version);
+        add_filter('pre_wp_mail', array($emailer, 'override_wp_mail'), 10, 6);
     }
 
     public function override_wp_mail($pre_wp_mail, $to, $subject = '', $message = '', $headers = '', $attachments = array())
@@ -89,7 +83,7 @@ class WP_Mail_Master
                 'attachments' => $attachments
             ], true));
 
-            $emailer = new WP_Mail_Master_Emailer();
+            $emailer = new WP_Mail_Master_Emailer($this->plugin_name, $this->version);
 
             if (is_array($to)) {
                 error_log('WP Mail Master - Processing array input');
