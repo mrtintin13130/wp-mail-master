@@ -97,15 +97,14 @@ class WP_Mail_Master_Dashboard_Widget
         if (!$wpdb) {
             return;
         }
-        $table_name = $wpdb->prefix . 'wp_mail_master_logs';
 
-        // Get total counts for the summary using a single query
+        // Get total counts for the summary using a single query with proper table prefix handling
         $counts = $wpdb->get_results($wpdb->prepare("
             SELECT status, COUNT(*) as count 
-            FROM $table_name 
-            WHERE status IN ('success', 'error', 'spam', 'blocked')
+            FROM {$wpdb->prefix}wp_mail_master_logs 
+            WHERE status IN (%s, %s, %s, %s)
             GROUP BY status
-        "));
+        ", 'success', 'error', 'spam', 'blocked'));
 
         $total_sent = 0;
         $total_errors = 0;
@@ -132,18 +131,18 @@ class WP_Mail_Master_Dashboard_Widget
         $end_date = current_time('Y-m-d 23:59:59');
         $start_date = date('Y-m-d 00:00:00', strtotime('-30 days', strtotime($end_date)));
 
-        // Get all data in a single query
+        // Get all data in a single query with proper table prefix handling and prepared statement
         $logs = $wpdb->get_results($wpdb->prepare("
             SELECT 
                 DATE(created_at) as log_date,
-                SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as sent_count,
-                SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as error_count,
-                SUM(CASE WHEN status IN ('spam', 'blocked') THEN 1 ELSE 0 END) as blocked_count
-            FROM $table_name
+                SUM(CASE WHEN status = %s THEN 1 ELSE 0 END) as sent_count,
+                SUM(CASE WHEN status = %s THEN 1 ELSE 0 END) as error_count,
+                SUM(CASE WHEN status IN (%s, %s) THEN 1 ELSE 0 END) as blocked_count
+            FROM {$wpdb->prefix}wp_mail_master_logs
             WHERE created_at BETWEEN %s AND %s
             GROUP BY DATE(created_at)
             ORDER BY log_date ASC
-        ", $start_date, $end_date));
+        ", 'success', 'error', 'spam', 'blocked', $start_date, $end_date));
 
         // Initialize arrays with dates as keys
         $dates = array();

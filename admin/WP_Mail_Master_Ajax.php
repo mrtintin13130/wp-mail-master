@@ -86,37 +86,39 @@ class WP_Mail_Master_Ajax
         check_ajax_referer('save_template', 'template_nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error();
+            wp_send_json_error(array('message' => __('Permission denied.', 'wp-mail-master')));
+            return;
         }
 
         $template_id = sanitize_text_field($_POST['template_id']);
         $template_data = wp_unslash($_POST['template']);
 
-        // Get existing templates
-        $templates = get_option('wp_mail_master_templates', array());
+        try {
+            // Validate template using our new validator
+            $validator = new WP_Mail_Master_Template_Validator();
+            $sanitized_data = $validator->validate_template($template_data);
 
-        // Sanitize template data
-        $sanitized_data = [
-            'name' => sanitize_text_field($template_data['name']),
-            'subject' => sanitize_text_field($template_data['subject']),
-            'content' => wp_kses_post($template_data['content'])
-        ];
+            // Get existing templates
+            $templates = get_option('wp_mail_master_templates', array());
 
-        // Save the template
-        $templates[$template_id] = $sanitized_data;
+            // Save the template
+            $templates[$template_id] = $sanitized_data;
 
-        // Update templates in database
-        $result = update_option('wp_mail_master_templates', $templates);
+            // Update templates in database
+            $result = update_option('wp_mail_master_templates', $templates);
 
-        if ($result) {
-            wp_send_json_success(array(
-                'message' => __('Template saved successfully.', 'wp-mail-master'),
-                'template_id' => $template_id
-            ));
-        } else {
-            wp_send_json_error(array(
-                'message' => __('Failed to save template.', 'wp-mail-master')
-            ));
+            if ($result) {
+                wp_send_json_success(array(
+                    'message' => __('Template saved successfully.', 'wp-mail-master'),
+                    'template_id' => $template_id
+                ));
+            } else {
+                wp_send_json_error(array('message' => __('Failed to save template.', 'wp-mail-master')));
+            }
+        } catch (WP_Mail_Master_Exception $e) {
+            wp_send_json_error(array('message' => $e->getMessage()));
+        } catch (\Exception $e) {
+            wp_send_json_error(array('message' => __('An unexpected error occurred.', 'wp-mail-master')));
         }
     }
 
@@ -221,12 +223,21 @@ class WP_Mail_Master_Ajax
         $template = $templates[$template_id];
 
         // Create test content
+        $template_subject = isset($template['subject']) ? (string)$template['subject'] : '';
+        $site_name = (string)get_bloginfo('name');
+        $current_date = (string)date_i18n(get_option('date_format'));
+        
         $subject = str_replace(
             array('{site_name}', '{date}'),
-            array(get_bloginfo('name'), date_i18n(get_option('date_format'))),
-            $template['subject']
+            array($site_name, $current_date),
+            $template_subject
         );
 
+        $template_content = isset($template['content']) ? (string)$template['content'] : '';
+        $site_url = (string)get_bloginfo('url');
+        $current_year = (string)date('Y');
+        $test_message = (string)__('This is a test email from your website.', 'wp-mail-master');
+        
         $content = str_replace(
             array(
                 '{site_name}',
@@ -237,14 +248,14 @@ class WP_Mail_Master_Ajax
                 '{email_content}'
             ),
             array(
-                get_bloginfo('name'),
-                get_bloginfo('url'),
+                $site_name,
+                $site_url,
                 $subject,
-                date('Y'),
-                date_i18n(get_option('date_format')),
-                __('This is a test email from your website.', 'wp-mail-master')
+                $current_year,
+                $current_date,
+                $test_message
             ),
-            $template['content']
+            $template_content
         );
 
         $headers = array('Content-Type: text/html; charset=UTF-8');

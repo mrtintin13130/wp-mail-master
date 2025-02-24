@@ -27,9 +27,11 @@ class WP_Mail_Master_Templates
         add_action('wp_ajax_preview_template', array($this, 'ajax_preview_template'));
 
         add_action('admin_enqueue_scripts', function ($hook) {
-            if (strpos($hook, 'wp-mail-master-templates') !== false) {
+            if (strpos((string)$hook, 'wp-mail-master-templates') !== false) {
                 wp_enqueue_style('thickbox');
                 wp_enqueue_script('thickbox');
+                wp_enqueue_style('wp-mail-master-templates');
+                wp_enqueue_script('wp-mail-master-templates');
             }
         });
 
@@ -148,7 +150,7 @@ class WP_Mail_Master_Templates
                 date('Y'),
                 date_i18n(get_option('date_format'))
             ],
-            $template
+            (string)$template
         );
     }
 

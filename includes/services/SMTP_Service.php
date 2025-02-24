@@ -124,14 +124,47 @@ class SMTP_Service extends Abstract_Email_Service
 
                 // Add custom headers if provided
                 if (!empty($headers)) {
-                    $this->addCustomHeaders($mail, $headers);
+                    if (!is_array($headers) && $headers !== null) {
+                        // Ensure headers is a string before processing
+                        $headers = (string)$headers;
+                        $headers = explode("\n", str_replace("\r\n", "\n", $headers));
+                    } elseif ($headers === null) {
+                        $headers = array();
+                    }
+                    
+                    // Ensure each header is a string
+                    $headers = array_map(function($header) {
+                        return $header === null ? '' : (string)$header;
+                    }, (array)$headers);
+                    
+                    foreach ($headers as $header) {
+                        // Skip if not a string or empty
+                        if (empty($header)) {
+                            continue;
+                        }
+
+                        // Skip if no colon found
+                        $header_str = (string)$header;
+                        if (strpos($header_str, ':') === false) {
+                            continue;
+                        }
+
+                        list($name, $value) = explode(':', $header_str, 2);
+                        $name = trim((string)$name);
+                        $value = trim((string)$value);
+                        
+                        if (!empty($name) && !empty($value)) {
+                            $mail->addCustomHeader($name, $value);
+                        }
+                    }
                 }
 
                 // Content
                 $mail->isHTML(true);
-                $mail->Subject = $subject;
-                $mail->Body = $message;
-                $mail->AltBody = wp_strip_all_tags($message); // Plain text version
+                $mail->Subject = (string)($subject ?: '');
+                $message_str = (string)($message ?: '');
+                $mail->Body = $message_str;
+                $mail->AltBody = wp_strip_all_tags($message_str); // Plain text version
 
                 // Handle attachments
                 if (!empty($attachments)) {
@@ -195,22 +228,6 @@ class SMTP_Service extends Abstract_Email_Service
                     'filetype' => $filetype
                 ]
             );
-        }
-    }
-
-    private function addCustomHeaders(PHPMailer $mail, $headers)
-    {
-        if (is_string($headers)) {
-            $headers = explode("\n", str_replace("\r\n", "\n", $headers));
-        }
-
-        if (is_array($headers)) {
-            foreach ($headers as $header) {
-                if (strpos($header, ':') !== false) {
-                    list($name, $value) = explode(':', $header, 2);
-                    $mail->addCustomHeader(trim($name), trim($value));
-                }
-            }
         }
     }
 }

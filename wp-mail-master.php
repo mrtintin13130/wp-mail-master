@@ -54,12 +54,6 @@ register_activation_hook(__FILE__, function () {
     // Create/upgrade database tables
     $db = new WP_Mail_Master_DB();
     $db->create_tables();
-    
-    // Create queue table if you're using it
-    if (class_exists('WP_Mail_Master_Queue')) {
-        $queue = new WP_Mail_Master_Queue('wp-mail-master', WP_MAIL_MASTER_VERSION);
-        $queue->create_queue_table();
-    }
 });
 
 // Register the deactivation hook
@@ -67,7 +61,6 @@ register_deactivation_hook(__FILE__, function() {
     $db = new WP_Mail_Master_DB();
     $db->delete_tables();
 });
-
 
 // Schedule cleanup
 if (!wp_next_scheduled('wp_mail_master_cleanup')) {

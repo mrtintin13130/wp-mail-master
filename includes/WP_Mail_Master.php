@@ -25,7 +25,6 @@ class WP_Mail_Master
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_i18n.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Emailer.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_DB.php';
-        require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Queue.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Error_Handler.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Exception.php';
         require_once WP_MAIL_MASTER_PLUGIN_DIR . 'includes/WP_Mail_Master_Spam_Protection.php';
@@ -70,21 +69,107 @@ class WP_Mail_Master
         try {
             error_log('WP Mail Master - Starting wp_mail override');
             
+            // If another plugin has already handled this, return their result
             if ($pre_wp_mail !== null) {
                 error_log('WP Mail Master - Email already handled by another plugin');
                 return $pre_wp_mail;
             }
 
-            error_log('WP Mail Master - Initial arguments: ' . print_r([
-                'to' => $to,
-                'subject' => $subject,
-                'message' => substr($message, 0, 100) . '...', 
-                'headers' => $headers,
-                'attachments' => $attachments
-            ], true));
+            // Early return if no recipient
+            if (empty($to)) {
+                error_log('WP Mail Master - No recipient specified');
+                return null;
+            }
 
+            // Convert all inputs to their proper types first
+            $to = is_array($to) ? array_map(function($email) {
+                return (string)($email ?: '');
+            }, $to) : (string)($to ?: '');
+
+            $subject = (string)($subject ?: '');
+            $message = (string)($message ?: '');
+
+            // Handle headers
+            if (is_array($headers)) {
+                $headers = array_map(function($header) {
+                    return (string)($header ?: '');
+                }, $headers);
+            } else {
+                $headers = (string)($headers ?: '');
+                if (!empty($headers)) {
+                    $headers = array_map(function($header) {
+                        return (string)($header ?: '');
+                    }, explode("\n", str_replace("\r\n", "\n", $headers)));
+                } else {
+                    $headers = array();
+                }
+            }
+
+            // Handle attachments
+            if (is_array($attachments)) {
+                $attachments = array_map(function($attachment) {
+                    return (string)($attachment ?: '');
+                }, $attachments);
+            } else {
+                $attachments = !empty($attachments) ? array((string)($attachments ?: '')) : array();
+            }
+
+            // If $to is an array containing email data
+            if (is_array($to) && isset($to['to'])) {
+                $args = $to;
+                $to = is_array($args['to']) ? array_map(function($email) {
+                    return (string)($email ?: '');
+                }, $args['to']) : (string)($args['to'] ?: '');
+                
+                $subject = (string)($args['subject'] ?? '');
+                $message = (string)($args['message'] ?? '');
+                
+                // Process headers from args
+                if (isset($args['headers'])) {
+                    if (is_array($args['headers'])) {
+                        $headers = array_map(function($header) {
+                            return (string)($header ?: '');
+                        }, $args['headers']);
+                    } else {
+                        $header_str = (string)($args['headers'] ?: '');
+                        $headers = !empty($header_str) ? 
+                            array_map(function($header) {
+                                return (string)($header ?: '');
+                            }, explode("\n", str_replace("\r\n", "\n", $header_str))) : 
+                            array();
+                    }
+                }
+                
+                // Process attachments from args
+                if (isset($args['attachments'])) {
+                    if (is_array($args['attachments'])) {
+                        $attachments = array_map(function($attachment) {
+                            return (string)($attachment ?: '');
+                        }, $args['attachments']);
+                    } else {
+                        $attachments = !empty($args['attachments']) ? 
+                            array((string)($args['attachments'] ?: '')) : 
+                            array();
+                    }
+                }
+            }
+
+            // Ensure we have valid strings before proceeding
+            if (!is_string($subject) || !is_string($message)) {
+                error_log('WP Mail Master - Invalid subject or message type');
+                return null;
+            }
+
+            // Create emailer instance and send
             $emailer = new WP_Mail_Master_Emailer($this->plugin_name, $this->version);
+            $result = $emailer->send_email($to, $subject, $message, $headers, $attachments);
+            
+            error_log('WP Mail Master - Send result: ' . var_export($result, true));
+            return $result ? true : null;
 
+        } catch (\Exception $e) {
+            error_log('WP Mail Master - wp_mail override error: ' . $e->getMessage());
+            error_log('WP Mail Master - Error trace: ' . $e->getTraceAsString());
             if (is_array($to)) {
                 error_log('WP Mail Master - Processing array input');
                 if (isset($to['to'])) {
@@ -99,34 +184,50 @@ class WP_Mail_Master
                     );
                 }
                 
-                $to = $args['to'];
-                $subject = $args['subject'];
-                $message = $args['message'];
-                $headers = $args['headers'];
-                $attachments = $args['attachments'];
+                $to = is_array($args['to']) ? array_map('strval', $args['to']) : (string)($args['to'] ?: '');
+                $subject = (string)($args['subject'] ?? '');
+                $message = (string)($args['message'] ?? '');
+                $headers = isset($args['headers']) ? (is_array($args['headers']) ? array_map('strval', $args['headers']) : explode("\n", str_replace("\r\n", "\n", (string)($args['headers'] ?: '')))) : array();
+                $attachments = isset($args['attachments']) ? (is_array($args['attachments']) ? array_map('strval', $args['attachments']) : array((string)$args['attachments'])) : array();
             }
 
-            if (!is_array($headers)) {
-                $headers = explode("\n", str_replace("\r\n", "\n", $headers));
+            // Process headers
+            if (is_string($headers) && !empty($headers)) {
+                $headers = array_map('strval', explode("\n", str_replace("\r\n", "\n", (string)$headers)));
+            } elseif (!is_array($headers)) {
+                $headers = array();
             }
+
+            // Ensure each header is a string and not null
+            $headers = array_map(function($header) {
+                return (string)($header ?: '');
+            }, (array)$headers);
+
             error_log('WP Mail Master - Normalized headers: ' . print_r($headers, true));
 
-            if (!is_array($attachments)) {
-                $attachments = explode("\n", str_replace("\r\n", "\n", $attachments));
+            // Process attachments
+            if (is_string($attachments) && !empty($attachments)) {
+                $attachments = array_map('strval', explode("\n", str_replace("\r\n", "\n", (string)$attachments)));
+            } elseif (!is_array($attachments)) {
+                $attachments = array();
             }
-            error_log('WP Mail Master - Normalized attachments: ' . print_r($attachments, true));
+
+            // Ensure each attachment path is a string
+            $attachments = array_map(function($attachment) {
+                return (string)($attachment ?: '');
+            }, (array)$attachments);
 
             error_log('WP Mail Master - Calling send_email');
             $result = $emailer->send_email($to, $subject, $message, $headers, $attachments);
             
             error_log('WP Mail Master - Send result: ' . var_export($result, true));
             
-            return true;
+            return $result ? true : null;
 
         } catch (\Exception $e) {
             error_log('WP Mail Master - wp_mail override error: ' . $e->getMessage());
             error_log('WP Mail Master - Error trace: ' . $e->getTraceAsString());
-            return false;
+            return null;
         }
     }
 

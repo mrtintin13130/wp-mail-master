@@ -37,9 +37,11 @@ class WP_Mail_Master_Emailer
             error_log('WP Mail Master - Input validation for recipient: ' . print_r($to, true));
 
             // Normalize $to to array and validate each email
-            $to_emails = is_array($to) ? $to : array($to);
-            $valid_emails = array();
+            $to_emails = is_array($to) ? array_map(function($email) {
+                return (string)($email ?: '');
+            }, $to) : array((string)($to ?: ''));
             
+            $valid_emails = array();
             foreach ($to_emails as $email) {
                 error_log('WP Mail Master - Validating email: ' . $email);
                 if (is_string($email) && is_email($email)) {
@@ -59,10 +61,10 @@ class WP_Mail_Master_Emailer
             // Prepare email data for spam check
             $email_data = [
                 'to' => $valid_emails,
-                'subject' => $subject,
-                'message' => $message,
+                'subject' => (string)($subject ?: ''),
+                'message' => (string)($message ?: ''),
                 'honeypot_field' => isset($_POST['wp_mail_master_hp']) ? 'wp_mail_master_hp' : '',
-                'honeypot_field_value' => isset($_POST['wp_mail_master_hp']) ? $_POST['wp_mail_master_hp'] : ''
+                'honeypot_field_value' => isset($_POST['wp_mail_master_hp']) ? (string)$_POST['wp_mail_master_hp'] : ''
             ];
 
             try {
@@ -85,43 +87,63 @@ class WP_Mail_Master_Emailer
             // Get the template (fallback to simple if selected doesn't exist)
             $template = isset($templates[$template_id]) ? $templates[$template_id] : $templates['simple'];
 
+            // Validate template before using it
+            $validator = new WP_Mail_Master_Template_Validator();
+            try {
+                $template = $validator->validate_template($template);
+            } catch (WP_Mail_Master_Exception $e) {
+                error_log('WP Mail Master - Template validation failed: ' . $e->getMessage());
+                // Fall back to simple template if validation fails
+                $template = $templates['simple'];
+            }
+
             // Replace variables in subject
+            $subject_str = (string)($subject ?: '');
+            $message_str = (string)($message ?: '');
+            
             $variables = array(
-                '{site_name}' => get_bloginfo('name'),
-                '{site_url}' => get_bloginfo('url'),
-                '{year}' => date('Y'),
-                '{date}' => date_i18n(get_option('date_format')),
-                '{email_title}' => $subject,
-                '{email_content}' => $message
+                '{site_name}' => (string)get_bloginfo('name'),
+                '{site_url}' => (string)get_bloginfo('url'),
+                '{year}' => (string)date('Y'),
+                '{date}' => (string)date_i18n(get_option('date_format')),
+                '{email_title}' => $subject_str,
+                '{email_content}' => $message_str
             );
 
             // Parse template variables in subject
+            $template_subject = isset($template['subject']) ? (string)$template['subject'] : '';
+            $subject_to_parse = $subject_str ?: $template_subject;
             $parsed_subject = str_replace(
                 array_keys($variables),
                 array_values($variables),
-                $subject ? $subject : $template['subject']
+                (string)$subject_to_parse
             );
 
-            // Replace variables in template
+            // Replace variables in template content
+            $template_content = isset($template['content']) ? (string)$template['content'] : '';
             $html_message = str_replace(
                 array_keys($variables),
                 array_values($variables),
-                $template['content']
+                (string)$template_content
             );
 
             // Ensure headers include HTML content type
             if (empty($headers)) {
                 $headers = array('Content-Type: text/html; charset=UTF-8');
             } elseif (is_string($headers)) {
-                $headers = array($headers, 'Content-Type: text/html; charset=UTF-8');
+                $headers = array_map(function($header) {
+                    return (string)($header ?: '');
+                }, array_filter(array($headers, 'Content-Type: text/html; charset=UTF-8')));
             } elseif (is_array($headers)) {
-                $headers[] = 'Content-Type: text/html; charset=UTF-8';
+                $headers = array_map(function($header) {
+                    return (string)($header ?: '');
+                }, array_merge($headers, array('Content-Type: text/html; charset=UTF-8')));
             }
 
             // If we don't have a valid service, fall back to wp_mail
             if (!$this->service) {
                 error_log('WP Mail Master - No email service configured, falling back to wp_mail');
-                return wp_mail(implode(',', $valid_emails), $parsed_subject, $html_message, $headers, $attachments);
+                return wp_mail($valid_emails[0], $parsed_subject, $html_message, $headers, $attachments);
             }
 
             // Process the email through the selected service
@@ -142,7 +164,7 @@ class WP_Mail_Master_Emailer
                 // If service fails due to configuration, fall back to wp_mail
                 if ($e->getCode() === WP_Mail_Master_Exception::INVALID_CONFIG_ERROR) {
                     error_log('WP Mail Master - Service not configured, falling back to wp_mail');
-                    return wp_mail(implode(',', $valid_emails), $parsed_subject, $html_message, $headers, $attachments);
+                    return wp_mail($valid_emails[0], $parsed_subject, $html_message, $headers, $attachments);
                 }
                 throw $e;
             }
@@ -157,9 +179,9 @@ class WP_Mail_Master_Emailer
             error_log('WP Mail Master - Exception trace: ' . $e->getTraceAsString());
             $error_info = $e->getMessage();
             $this->log_email(
-                is_array($to) ? implode(',', $to) : $to,
-                $subject,
-                $message,
+                is_array($to) ? implode(',', array_map(function($email) { return (string)($email ?: ''); }, $to)) : (string)($to ?: ''),
+                (string)($subject ?: ''),
+                (string)($message ?: ''),
                 'failed',
                 $error_info
             );
@@ -172,9 +194,9 @@ class WP_Mail_Master_Emailer
             error_log('WP Mail Master - Error trace: ' . $e->getTraceAsString());
             $error_info = 'Unexpected error: ' . $e->getMessage();
             $this->log_email(
-                is_array($to) ? implode(',', $to) : $to,
-                $subject,
-                $message,
+                is_array($to) ? implode(',', array_map(function($email) { return (string)($email ?: ''); }, $to)) : (string)($to ?: ''),
+                (string)($subject ?: ''),
+                (string)($message ?: ''),
                 'failed',
                 $error_info
             );
@@ -195,13 +217,17 @@ class WP_Mail_Master_Emailer
 
         // Handle array input for $to
         if (is_array($to)) {
-            $to = implode(',', $to);
+            $to = implode(',', array_map('strval', $to));
         }
+        $to = (string)$to;
+
+        // Ensure subject is a string
+        $subject = (string)$subject;
 
         // Create a summary of the message instead of storing the full HTML
         if (is_string($message)) {
             // Strip HTML tags
-            $stripped_message = wp_strip_all_tags($message);
+            $stripped_message = wp_strip_all_tags((string)$message);
             // Get first 150 characters
             $message_summary = substr($stripped_message, 0, 150);
             if (strlen($stripped_message) > 150) {
@@ -213,13 +239,16 @@ class WP_Mail_Master_Emailer
             $message_summary = 'Invalid message format';
         }
 
-        // Add debug log
+        // Ensure status is a string
+        $status = (string)$status;
+
+        // Add debug log with proper type casting
         error_log(sprintf(
             "WP Mail Master - Logging email: to=%s, subject=%s, status=%s, error=%s",
             $to,
             $subject,
             $status,
-            $error_info ?? 'none'
+            $error_info !== null ? (string)$error_info : 'none'
         ));
 
         // Map old statuses to new ones with better clarity
@@ -230,22 +259,22 @@ class WP_Mail_Master_Emailer
             'success' => 'success',
             'error' => 'error'
         ];
-        $mapped_status = isset($status_map[$status]) ? $status_map[$status] : $status;
+        $mapped_status = (string)(isset($status_map[$status]) ? $status_map[$status] : $status);
 
         // Store the full message in metadata for reference
         $metadata = [
             'to_email' => $to,
             'subject' => $subject,
-            'full_message' => $message,
+            'full_message' => is_string($message) ? (string)$message : json_encode($message),
             'status_details' => [
                 'original_status' => $status,
                 'mapped_status' => $mapped_status,
-                'timestamp' => current_time('mysql')
+                'timestamp' => (string)current_time('mysql')
             ]
         ];
 
-        if ($error_info) {
-            $metadata['error_info'] = $error_info;
+        if ($error_info !== null) {
+            $metadata['error_info'] = (string)$error_info;
         }
 
         // Get logs instance
@@ -262,16 +291,16 @@ class WP_Mail_Master_Emailer
         // Log with new system using the summary as the main message
         $logs->log(
             'email',
-            $level,
+            (string)$level,
             $mapped_status,
-            $message_summary,
+            (string)$message_summary,
             null,
             $metadata
         );
     }
     public function send_test_email($to)
     {
-        $site_name = get_bloginfo('name');
+        $site_name = (string)get_bloginfo('name');
         $subject = 'Test Email from ' . $site_name;
         $message = '<p>This is a test email from WP Mail Master plugin.</p>' .
                   '<p>If you are reading this message, it means the email was delivered successfully and the plugin is working correctly.</p>' .
@@ -290,16 +319,19 @@ class WP_Mail_Master_Emailer
             // Handle case where all parameters are passed as a single array
             if (is_array($to) && isset($to['to'])) {
                 $email_data = $to;
-                $to = $email_data['to'];
-                $subject = $email_data['subject'];
-                $message = $email_data['message'];
-                $headers = $email_data['headers'];
+                $to = is_array($email_data['to']) ? array_map('strval', $email_data['to']) : (string)$email_data['to'];
+                $subject = isset($email_data['subject']) ? (string)$email_data['subject'] : '';
+                $message = isset($email_data['message']) ? (string)$email_data['message'] : '';
+                $headers = isset($email_data['headers']) ? $email_data['headers'] : '';
                 $attachments = isset($email_data['attachments']) ? $email_data['attachments'] : array();
             }
 
             // Handle case where 'to' is an array of email addresses
-            if (is_array($to) && isset($to[0])) {
-                $to = $to[0]; // Take the first email address
+            if (is_array($to)) {
+                $to = array_map('strval', $to);
+                $to = isset($to[0]) ? $to[0] : ''; // Take the first email address
+            } else {
+                $to = (string)$to;
             }
 
             // Ensure we have required fields
@@ -309,7 +341,7 @@ class WP_Mail_Master_Emailer
             }
 
             // Send email using our service
-            $result = $this->send_email($to, $subject, $message, $headers, $attachments);
+            $result = $this->send_email($to, (string)$subject, (string)$message, $headers, $attachments);
             
             // Return true if successful (prevents WordPress from sending), null if failed (lets WordPress try)
             return $result ? true : null;

@@ -88,19 +88,23 @@ class WP_Mail_Master_Logs {
                         </p>
                         <?php if ($metadata): ?>
                             <?php if (isset($metadata['to_email'])): ?>
-                                <p><strong><?php esc_html_e('To:', 'wp-mail-master'); ?></strong> <?php echo esc_html($metadata['to_email']); ?></p>
+                                <p><strong><?php esc_html_e('To:', 'wp-mail-master'); ?></strong> <?php echo esc_html((string)$metadata['to_email']); ?></p>
                             <?php endif; ?>
                             <?php if (isset($metadata['subject'])): ?>
-                                <p><strong><?php esc_html_e('Subject:', 'wp-mail-master'); ?></strong> <?php echo esc_html($metadata['subject']); ?></p>
+                                <p><strong><?php esc_html_e('Subject:', 'wp-mail-master'); ?></strong> <?php echo esc_html((string)$metadata['subject']); ?></p>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
 
                     <?php if (!empty($metadata['error_info'])): ?>
-                        <div class="error-info <?php echo strpos($metadata['error_info'], 'Spam protection:') !== false ? 'spam-info' : ''; ?>">
+                        <?php 
+                            $error_info = (string)($metadata['error_info'] ?? '');
+                            $is_spam_protection = strpos($error_info, 'Spam protection:') !== false;
+                        ?>
+                        <div class="error-info <?php echo $is_spam_protection ? 'spam-info' : ''; ?>">
                             <h3>
                                 <?php 
-                                    if (strpos($metadata['error_info'], 'Spam protection:') !== false) {
+                                    if ($is_spam_protection) {
                                         esc_html_e('Spam Detection Information', 'wp-mail-master');
                                     } else {
                                         esc_html_e('Error Information', 'wp-mail-master');
@@ -108,7 +112,6 @@ class WP_Mail_Master_Logs {
                                 ?>
                             </h3>
                             <pre><?php 
-                                $error_info = $metadata['error_info'];
                                 if (strpos($error_info, 'Spam protection:') === 0) {
                                     $error_info = substr($error_info, strlen('Spam protection:'));
                                 }
@@ -126,10 +129,10 @@ class WP_Mail_Master_Logs {
                         </ul>
 
                         <div id="rendered" class="tab-content active">
-                            <iframe id="email-preview" srcdoc="<?php echo esc_attr($metadata['full_message']); ?>" style="width: 100%; height: 500px; border: 1px solid #ddd;"></iframe>
+                            <iframe id="email-preview" srcdoc="<?php echo esc_attr((string)($metadata['full_message'] ?? '')); ?>" style="width: 100%; height: 500px; border: 1px solid #ddd;"></iframe>
                         </div>
                         <div id="source" class="tab-content" style="display: none;">
-                            <pre><?php echo esc_html($metadata['full_message']); ?></pre>
+                            <pre><?php echo esc_html((string)($metadata['full_message'] ?? '')); ?></pre>
                         </div>
                     </div>
 
@@ -300,17 +303,17 @@ class WP_Mail_Master_Logs {
                                 <?php 
                                     $metadata = json_decode($log->metadata, true);
                                     if ($metadata && isset($metadata['subject'])) {
-                                        echo '<strong>' . esc_html__('Subject:', 'wp-mail-master') . '</strong> ' . esc_html($metadata['subject']) . '<br>';
+                                        echo '<strong>' . esc_html__('Subject:', 'wp-mail-master') . '</strong> ' . esc_html((string)$metadata['subject']) . '<br>';
                                     }
                                     if ($metadata && isset($metadata['to_email'])) {
-                                        echo '<strong>' . esc_html__('To:', 'wp-mail-master') . '</strong> ' . esc_html($metadata['to_email']) . '<br>';
+                                        echo '<strong>' . esc_html__('To:', 'wp-mail-master') . '</strong> ' . esc_html((string)$metadata['to_email']) . '<br>';
                                     }
                                     
                                     // Add spam indicator if applicable
                                     if ($log->status === 'blocked' && !empty($metadata['error_info'])) {
                                         echo '<div class="spam-indicator">';
                                         echo '<span class="dashicons dashicons-shield"></span> ';
-                                        $error_info = $metadata['error_info'];
+                                        $error_info = (string)($metadata['error_info'] ?? '');
                                         if (strpos($error_info, 'Spam protection:') === 0) {
                                             $error_info = substr($error_info, strlen('Spam protection:'));
                                         }
@@ -318,7 +321,7 @@ class WP_Mail_Master_Logs {
                                         echo '</div>';
                                     }
                                     
-                                    echo '<div class="message-summary">' . esc_html($log->message) . '</div>';
+                                    echo '<div class="message-summary">' . esc_html((string)$log->message) . '</div>';
                                 ?>
                                 <?php if (!empty($log->details) || !empty($log->metadata)): ?>
                                     <div class="row-actions">

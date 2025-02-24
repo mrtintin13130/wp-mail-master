@@ -171,7 +171,7 @@ class WP_Mail_Master_Spam_Protection {
      * Check content for spam signals
      */
     private function check_content($subject, $message) {
-        $combined_content = strtolower($subject . ' ' . strip_tags($message));
+        $combined_content = strtolower((string)$subject . ' ' . strip_tags((string)$message));
         
         // Check for spam keywords if content filtering is enabled
         if (!empty($this->options['content_filtering_enabled'])) {
@@ -179,7 +179,7 @@ class WP_Mail_Master_Spam_Protection {
             $keyword_count = 0;
             
             foreach ($spam_keywords as $keyword) {
-                if (strpos($combined_content, $keyword) !== false) {
+                if (strpos($combined_content, (string)$keyword) !== false) {
                     $keyword_count++;
                 }
             }
