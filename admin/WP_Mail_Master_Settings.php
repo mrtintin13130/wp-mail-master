@@ -308,7 +308,7 @@ class WP_Mail_Master_Settings {
         $api_key = isset($options['brevo_api_key']) ? $options['brevo_api_key'] : '';
         ?>
         <div class="setting-field">
-            <input type="text" name="wp_mail_master_options[brevo_api_key]" value="<?php echo esc_attr($api_key); ?>" />
+            <input type="password" name="wp_mail_master_options[brevo_api_key]" value="<?php echo esc_attr($api_key); ?>" />
             <p class="description">
                 <?php _e('Enter your Brevo API key. You can find this in your Brevo account under SMTP & API → API Keys.', 'wp-mail-master'); ?>
             </p>
@@ -316,7 +316,7 @@ class WP_Mail_Master_Settings {
         <?php
     }
 
-    // SendGrid 
+    // SendGrid
     private function add_sendgrid_settings() {
         add_settings_section(
             'wp_mail_master_sendgrid_section',
@@ -352,7 +352,7 @@ class WP_Mail_Master_Settings {
         $api_key = isset($options['sendgrid_api_key']) ? $options['sendgrid_api_key'] : '';
         ?>
         <div class="setting-field">
-            <input type="text" name="wp_mail_master_options[sendgrid_api_key]" value="<?php echo esc_attr($api_key); ?>" />
+            <input type="password" name="wp_mail_master_options[sendgrid_api_key]" value="<?php echo esc_attr($api_key); ?>" />
             <p class="description">
                 <?php _e('Enter your SendGrid API key. You can create one in your SendGrid account under Settings → API Keys.', 'wp-mail-master'); ?>
             </p>
@@ -360,7 +360,7 @@ class WP_Mail_Master_Settings {
         <?php
     }
 
-    // SMTP.COM
+    // SMTP.com
     private function add_smtpcom_settings() {
         add_settings_section(
             'wp_mail_master_smtpcom_section',
@@ -549,7 +549,7 @@ class WP_Mail_Master_Settings {
         $secret_key = isset($options['mailjet_secret_key']) ? $options['mailjet_secret_key'] : '';
         ?>
         <div class="setting-field">
-            <input type="text" name="wp_mail_master_options[mailjet_secret_key]" value="<?php echo esc_attr($secret_key); ?>" />
+            <input type="password" name="wp_mail_master_options[mailjet_secret_key]" value="<?php echo esc_attr($secret_key); ?>" />
             <p class="description">
                 <?php _e('Enter your Mailjet Secret Key. This is paired with your API Key for authentication.', 'wp-mail-master'); ?>
             </p>

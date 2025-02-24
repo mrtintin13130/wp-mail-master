@@ -19,7 +19,7 @@ if (!isset($settings) || !($settings instanceof Martho\WpMailMaster\WP_Mail_Mast
     </h1>
     <form action="options.php" method="post">
         <?php
-        settings_fields('wp_mail_master_settings');
+        settings_fields('wp_mail_master_options');
         $settings->settings_fields();
 
         // General Settings Section
