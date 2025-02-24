@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-02-23T12:43:35+00:00\n"
+"POT-Creation-Date: 2025-02-24T15:03:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wp-mail-master\n"
@@ -21,8 +21,9 @@ msgid "WP Mail Master"
 msgstr ""
 
 #. Plugin URI of the plugin
+#. Author URI of the plugin
 #: wp-mail-master.php
-msgid "https://example.com/wp-mail-master"
+msgid "https://www.linkedin.com/in/martho/"
 msgstr ""
 
 #. Description of the plugin
@@ -35,17 +36,22 @@ msgstr ""
 msgid "Martho"
 msgstr ""
 
-#. Author URI of the plugin
-#: wp-mail-master.php
-msgid "https://example.com"
-msgstr ""
-
-#: admin/views/dashboard-widget.php:19
-msgid "Total Emails Sent"
-msgstr ""
-
 #: admin/views/dashboard-widget.php:23
-msgid "Total Errors"
+msgid "Emails Sent"
+msgstr ""
+
+#: admin/views/dashboard-widget.php:27
+#: admin/views/dashboard-widget.php:91
+msgid "Errors"
+msgstr ""
+
+#: admin/views/dashboard-widget.php:31
+#: admin/views/dashboard-widget.php:105
+msgid "Blocked/Spam"
+msgstr ""
+
+#: admin/views/dashboard-widget.php:77
+msgid "Sent Emails"
 msgstr ""
 
 #: admin/views/settings.php:10
@@ -114,7 +120,7 @@ msgid "Use This Template"
 msgstr ""
 
 #: admin/views/template-presets.php:195
-#: admin/WP_Mail_Master_Ajax.php:194
+#: admin/WP_Mail_Master_Ajax.php:196
 msgid "Failed to select template."
 msgstr ""
 
@@ -135,7 +141,7 @@ msgid "Template Name"
 msgstr ""
 
 #: admin/views/templates.php:51
-#: admin/WP_Mail_Master_Templates.php:160
+#: admin/WP_Mail_Master_Templates.php:162
 msgid "Email Subject"
 msgstr ""
 
@@ -157,7 +163,7 @@ msgstr ""
 
 #: admin/views/templates.php:201
 #: admin/views/templates.php:205
-#: admin/WP_Mail_Master_Ajax.php:118
+#: admin/WP_Mail_Master_Ajax.php:116
 msgid "Failed to save template."
 msgstr ""
 
@@ -170,13 +176,13 @@ msgid "Enter email address for test:"
 msgstr ""
 
 #: admin/views/templates.php:241
-#: admin/WP_Mail_Master_Ajax.php:254
+#: admin/WP_Mail_Master_Ajax.php:265
 msgid "Test email sent successfully!"
 msgstr ""
 
 #: admin/views/templates.php:242
 #: admin/WP_Mail_Master_Ajax.php:52
-#: admin/WP_Mail_Master_Ajax.php:258
+#: admin/WP_Mail_Master_Ajax.php:269
 msgid "Failed to send test email."
 msgstr ""
 
@@ -198,7 +204,7 @@ msgstr ""
 
 #: admin/WP_Mail_Master_Admin.php:129
 #: admin/WP_Mail_Master_Admin.php:130
-#: admin/WP_Mail_Master_Logs.php:226
+#: admin/WP_Mail_Master_Logs.php:229
 msgid "Logs"
 msgstr ""
 
@@ -208,7 +214,7 @@ msgstr ""
 
 #: admin/WP_Mail_Master_Admin.php:173
 #: admin/WP_Mail_Master_Logs.php:48
-#: admin/WP_Mail_Master_Logs.php:207
+#: admin/WP_Mail_Master_Logs.php:210
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -222,7 +228,7 @@ msgid "Test email sent successfully."
 msgstr ""
 
 #: admin/WP_Mail_Master_Ajax.php:28
-#: admin/WP_Mail_Master_Logs.php:189
+#: admin/WP_Mail_Master_Logs.php:192
 msgid "Security check failed."
 msgstr ""
 
@@ -231,7 +237,7 @@ msgid "You do not have permission to perform this action."
 msgstr ""
 
 #: admin/WP_Mail_Master_Ajax.php:41
-#: admin/WP_Mail_Master_Ajax.php:211
+#: admin/WP_Mail_Master_Ajax.php:213
 msgid "Invalid email address."
 msgstr ""
 
@@ -239,28 +245,33 @@ msgstr ""
 msgid "Test email limit reached. Please try again later."
 msgstr ""
 
-#: admin/WP_Mail_Master_Ajax.php:113
-msgid "Template saved successfully."
-msgstr ""
-
-#: admin/WP_Mail_Master_Ajax.php:136
-msgid "Cannot delete preset templates."
-msgstr ""
-
-#: admin/WP_Mail_Master_Ajax.php:165
+#: admin/WP_Mail_Master_Ajax.php:89
+#: admin/WP_Mail_Master_Ajax.php:167
 msgid "Permission denied."
 msgstr ""
 
-#: admin/WP_Mail_Master_Ajax.php:178
-#: admin/WP_Mail_Master_Ajax.php:217
+#: admin/WP_Mail_Master_Ajax.php:112
+msgid "Template saved successfully."
+msgstr ""
+
+#: admin/WP_Mail_Master_Ajax.php:121
+msgid "An unexpected error occurred."
+msgstr ""
+
+#: admin/WP_Mail_Master_Ajax.php:138
+msgid "Cannot delete preset templates."
+msgstr ""
+
+#: admin/WP_Mail_Master_Ajax.php:180
+#: admin/WP_Mail_Master_Ajax.php:219
 msgid "Template not found."
 msgstr ""
 
-#: admin/WP_Mail_Master_Ajax.php:188
+#: admin/WP_Mail_Master_Ajax.php:190
 msgid "Template selected successfully."
 msgstr ""
 
-#: admin/WP_Mail_Master_Ajax.php:245
+#: admin/WP_Mail_Master_Ajax.php:239
 msgid "This is a test email from your website."
 msgstr ""
 
@@ -298,149 +309,149 @@ msgid "Status:"
 msgstr ""
 
 #: admin/WP_Mail_Master_Logs.php:79
-#: admin/WP_Mail_Master_Logs.php:247
-#: admin/WP_Mail_Master_Logs.php:337
+#: admin/WP_Mail_Master_Logs.php:250
+#: admin/WP_Mail_Master_Logs.php:340
 msgid "Sent"
 msgstr ""
 
 #: admin/WP_Mail_Master_Logs.php:80
-#: admin/WP_Mail_Master_Logs.php:248
-#: admin/WP_Mail_Master_Logs.php:338
+#: admin/WP_Mail_Master_Logs.php:251
+#: admin/WP_Mail_Master_Logs.php:341
 msgid "Failed"
 msgstr ""
 
 #: admin/WP_Mail_Master_Logs.php:81
-#: admin/WP_Mail_Master_Logs.php:249
-#: admin/WP_Mail_Master_Logs.php:339
+#: admin/WP_Mail_Master_Logs.php:252
+#: admin/WP_Mail_Master_Logs.php:342
 msgid "Blocked (Spam)"
 msgstr ""
 
 #: admin/WP_Mail_Master_Logs.php:82
-#: admin/WP_Mail_Master_Logs.php:257
-#: admin/WP_Mail_Master_Logs.php:340
+#: admin/WP_Mail_Master_Logs.php:260
+#: admin/WP_Mail_Master_Logs.php:343
 msgid "Warning"
 msgstr ""
 
 #: admin/WP_Mail_Master_Logs.php:83
-#: admin/WP_Mail_Master_Logs.php:250
-#: admin/WP_Mail_Master_Logs.php:256
-#: admin/WP_Mail_Master_Logs.php:341
+#: admin/WP_Mail_Master_Logs.php:253
+#: admin/WP_Mail_Master_Logs.php:259
+#: admin/WP_Mail_Master_Logs.php:344
 msgid "Info"
 msgstr ""
 
 #: admin/WP_Mail_Master_Logs.php:91
-#: admin/WP_Mail_Master_Logs.php:306
+#: admin/WP_Mail_Master_Logs.php:309
 msgid "To:"
 msgstr ""
 
 #: admin/WP_Mail_Master_Logs.php:94
-#: admin/WP_Mail_Master_Logs.php:303
+#: admin/WP_Mail_Master_Logs.php:306
 msgid "Subject:"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:104
+#: admin/WP_Mail_Master_Logs.php:108
 msgid "Spam Detection Information"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:106
+#: admin/WP_Mail_Master_Logs.php:110
 msgid "Error Information"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:124
+#: admin/WP_Mail_Master_Logs.php:127
 msgid "Rendered Email"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:125
+#: admin/WP_Mail_Master_Logs.php:128
 msgid "Source Code"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:185
+#: admin/WP_Mail_Master_Logs.php:188
 msgid "You do not have permission to clear logs."
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:231
+#: admin/WP_Mail_Master_Logs.php:234
 msgid "Are you sure you want to clear all logs?"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:232
+#: admin/WP_Mail_Master_Logs.php:235
 msgid "Clear All Logs"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:239
+#: admin/WP_Mail_Master_Logs.php:242
 msgid "All Types"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:240
+#: admin/WP_Mail_Master_Logs.php:243
 msgid "Email"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:241
-#: admin/WP_Mail_Master_Logs.php:258
+#: admin/WP_Mail_Master_Logs.php:244
+#: admin/WP_Mail_Master_Logs.php:261
 msgid "Error"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:242
+#: admin/WP_Mail_Master_Logs.php:245
 #: admin/WP_Mail_Master_Security.php:21
 msgid "Security"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:246
+#: admin/WP_Mail_Master_Logs.php:249
 msgid "All Statuses"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:254
+#: admin/WP_Mail_Master_Logs.php:257
 msgid "All Levels"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:255
+#: admin/WP_Mail_Master_Logs.php:258
 msgid "Debug"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:262
+#: admin/WP_Mail_Master_Logs.php:265
 msgid "Search Logs:"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:265
+#: admin/WP_Mail_Master_Logs.php:268
 msgid "Search logs..."
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:266
+#: admin/WP_Mail_Master_Logs.php:269
 msgid "Filter Logs"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:272
+#: admin/WP_Mail_Master_Logs.php:275
 msgid "Time"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:273
+#: admin/WP_Mail_Master_Logs.php:276
 msgid "Type"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:274
+#: admin/WP_Mail_Master_Logs.php:277
 msgid "Level"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:275
+#: admin/WP_Mail_Master_Logs.php:278
 msgid "Message"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:276
+#: admin/WP_Mail_Master_Logs.php:279
 msgid "Status"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:282
+#: admin/WP_Mail_Master_Logs.php:285
 msgid "No logs found."
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:327
+#: admin/WP_Mail_Master_Logs.php:330
 msgid "View Details"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:502
+#: admin/WP_Mail_Master_Logs.php:505
 msgid "Show Details"
 msgstr ""
 
-#: admin/WP_Mail_Master_Logs.php:506
+#: admin/WP_Mail_Master_Logs.php:509
 msgid "Hide Details"
 msgstr ""
 
@@ -924,22 +935,22 @@ msgstr ""
 msgid "You do not have sufficient permissions to modify these settings."
 msgstr ""
 
-#: admin/WP_Mail_Master_Templates.php:158
+#: admin/WP_Mail_Master_Templates.php:160
 msgid "Website Name"
 msgstr ""
 
-#: admin/WP_Mail_Master_Templates.php:159
+#: admin/WP_Mail_Master_Templates.php:161
 msgid "Website URL"
 msgstr ""
 
-#: admin/WP_Mail_Master_Templates.php:161
+#: admin/WP_Mail_Master_Templates.php:163
 msgid "Main Email Content"
 msgstr ""
 
-#: admin/WP_Mail_Master_Templates.php:162
+#: admin/WP_Mail_Master_Templates.php:164
 msgid "Current Year"
 msgstr ""
 
-#: admin/WP_Mail_Master_Templates.php:163
+#: admin/WP_Mail_Master_Templates.php:165
 msgid "Current Date"
 msgstr ""

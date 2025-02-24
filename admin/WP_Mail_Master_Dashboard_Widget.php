@@ -43,7 +43,7 @@ class WP_Mail_Master_Dashboard_Widget
             }
             #dashboard-widgets .wp-mail-master-stats {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
                 gap: 12px;
                 margin-bottom: 20px;
             }
