@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: WP Mail Master 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-mail-master\n"
 "POT-Creation-Date: 2025-02-24T15:03:57+00:00\n"
-"PO-Revision-Date: 2025-02-24 16:05+0100\n"
+"PO-Revision-Date: 2025-02-24 16:43+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -289,7 +289,7 @@ msgstr "Détails de l’e-mails"
 
 #: admin/WP_Mail_Master_Logs.php:67
 msgid "← Back to Logs"
-msgstr "← Retour aux journaux"
+msgstr "← Retour à l’historique"
 
 #: admin/WP_Mail_Master_Logs.php:74
 msgid "Date/Time:"
@@ -358,7 +358,7 @@ msgstr "Êtes-vous sûr de vouloir effacer l’historique ?"
 
 #: admin/WP_Mail_Master_Logs.php:235
 msgid "Clear All Logs"
-msgstr "Effacer tous les journaux"
+msgstr "Effacer l’historique"
 
 #: admin/WP_Mail_Master_Logs.php:242
 msgid "All Types"
@@ -422,7 +422,7 @@ msgstr "Statut"
 
 #: admin/WP_Mail_Master_Logs.php:285
 msgid "No logs found."
-msgstr "Aucun journal trouvé."
+msgstr "Aucun historique trouvé."
 
 #: admin/WP_Mail_Master_Logs.php:330
 msgid "View Details"
@@ -653,8 +653,8 @@ msgstr ""
 #: admin/WP_Mail_Master_Settings.php:141
 msgid "Check the Email Logs section to monitor email delivery status"
 msgstr ""
-"Consultez la section Journaux de courrier électronique pour surveiller "
-"l’état de livraison des e-mails"
+"Consultez la section Historique des emails pour surveiller l’état de "
+"livraison des e-mails"
 
 #: admin/WP_Mail_Master_Settings.php:151
 msgid ""
