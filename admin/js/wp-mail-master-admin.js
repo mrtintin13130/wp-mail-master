@@ -41,30 +41,48 @@ jQuery(document).ready(function ($) {
       $("#test-email-address, #test-email-template, #send-test-email-button").prop("disabled", true);
 
       $.ajax({
-        url: wp_mail_master.ajax_url,
+        url: wpMailMasterAdmin.ajaxurl,
         type: "POST",
         data: {
           action: "send_test_email",
           test_email_address: emailAddress,
           template_id: selectedTemplate,
-          nonce: wp_mail_master.nonce,
+          nonce: wpMailMasterAdmin.nonce,
         },
         success: function (response) {
           $("#spinner").hide();
           $("#test-email-address, #test-email-template, #send-test-email-button").prop("disabled", false);
-          $("#test-email-result").html("<p class='success'>" + response.data.message + "</p>");
-        },
-        error: function (response) {
-          $("#spinner").hide();
-          $("#test-email-address, #test-email-template, #send-test-email-button").prop("disabled", false);
-          console.error("Error response:", response);
-          if (response.responseJSON && response.responseJSON.data) {
-            $("#test-email-result").html("<p class='error'>" + response.responseJSON.data.message + "</p>");
+          
+          if (response.success) {
+            $("#test-email-result")
+              .removeClass("error")
+              .addClass("success")
+              .html("Test email sent successfully!")
+              .show();
           } else {
-            $("#test-email-result").html("<p class='error'>An unknown error occurred.</p>");
+            $("#test-email-result")
+              .removeClass("success")
+              .addClass("error")
+              .html("Failed to send test email: " + response.data.message)
+              .show();
           }
         },
+        error: function (xhr, status, error) {
+          $("#spinner").hide();
+          $("#test-email-address, #test-email-template, #send-test-email-button").prop("disabled", false);
+          $("#test-email-result")
+            .removeClass("success")
+            .addClass("error")
+            .html("Failed to send test email: " + error)
+            .show();
+        },
       });
+    } else {
+      $("#test-email-result")
+        .removeClass("success")
+        .addClass("error")
+        .html("Please enter a valid email address")
+        .show();
     }
   });
 });

@@ -22,7 +22,10 @@ class WP_Mail_Master_Emailer
         $this->settings = new WP_Mail_Master_Settings($plugin_name, $version);
         $options = get_option('wp_mail_master_options', []);
         $service_type = isset($options['email_service']) ? $options['email_service'] : 'smtp';
+        
+        // Try to create the service, but don't fail if it can't be created
         $this->service = EmailServiceFactory::create($service_type, $options);
+        
         $this->templates = new WP_Mail_Master_Templates();
         $this->spam_protection = new WP_Mail_Master_Spam_Protection();
     }
@@ -115,18 +118,33 @@ class WP_Mail_Master_Emailer
                 $headers[] = 'Content-Type: text/html; charset=UTF-8';
             }
 
+            // If we don't have a valid service, fall back to wp_mail
+            if (!$this->service) {
+                error_log('WP Mail Master - No email service configured, falling back to wp_mail');
+                return wp_mail(implode(',', $valid_emails), $parsed_subject, $html_message, $headers, $attachments);
+            }
+
             // Process the email through the selected service
             $recipients = implode(',', $valid_emails);
             error_log('WP Mail Master - Attempting to send email to: ' . $recipients);
             
-            $result = $this->service->send($recipients, $parsed_subject, $html_message, $headers, $attachments);
-            error_log('WP Mail Master - Service send result: ' . var_export($result, true));
+            try {
+                $result = $this->service->send($recipients, $parsed_subject, $html_message, $headers, $attachments);
+                error_log('WP Mail Master - Service send result: ' . var_export($result, true));
 
-            if ($result === true) {
-                error_log('WP Mail Master - Email sent successfully');
-                $this->log_email($recipients, $parsed_subject, $html_message, 'success');
-                do_action('wp_mail_master_after_send_success', $email_data);
-                return true;
+                if ($result === true) {
+                    error_log('WP Mail Master - Email sent successfully');
+                    $this->log_email($recipients, $parsed_subject, $html_message, 'success');
+                    do_action('wp_mail_master_after_send_success', $email_data);
+                    return true;
+                }
+            } catch (WP_Mail_Master_Exception $e) {
+                // If service fails due to configuration, fall back to wp_mail
+                if ($e->getCode() === WP_Mail_Master_Exception::INVALID_CONFIG_ERROR) {
+                    error_log('WP Mail Master - Service not configured, falling back to wp_mail');
+                    return wp_mail(implode(',', $valid_emails), $parsed_subject, $html_message, $headers, $attachments);
+                }
+                throw $e;
             }
 
             error_log('WP Mail Master - Email sending failed');

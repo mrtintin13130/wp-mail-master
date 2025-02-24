@@ -17,7 +17,7 @@ class EmailServiceFactory {
             case 'smtpcom':
                 return new SMTPcom_Service($options);
             default:
-                throw new \InvalidArgumentException("Unknown email service: $service_type");
+                return null;
         }
     }
 }

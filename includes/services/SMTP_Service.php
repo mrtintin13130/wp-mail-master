@@ -23,6 +23,34 @@ class SMTP_Service extends Abstract_Email_Service
 
     public function validateConfig()
     {
+        // Check if SMTP is configured at all
+        if (!$this->isConfigured()) {
+            return false;
+        }
+        
+        // Validate configuration when called explicitly
+        return $this->validateSMTPConfig();
+    }
+
+    protected function isConfigured()
+    {
+        // Check if any SMTP settings are present
+        $smtp_fields = ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password'];
+        foreach ($smtp_fields as $field) {
+            if (!empty($this->options[$field])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function validateSMTPConfig()
+    {
+        // If not configured, don't validate
+        if (!$this->isConfigured()) {
+            return false;
+        }
+
         $required = ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_password'];
 
         foreach ($required as $field) {
@@ -40,15 +68,26 @@ class SMTP_Service extends Abstract_Email_Service
             throw new WP_Mail_Master_Exception(
                 'Invalid SMTP port number',
                 WP_Mail_Master_Exception::VALIDATION_ERROR,
-                ['port' => $this->options['smtp_port']]
+                ['field' => 'smtp_port']
             );
         }
 
         return true;
     }
 
-    public function send($to, $subject, $message, $headers = '', array $attachments = array())
+    public function send($to, $subject, $message, $headers = '', $attachments = [])
     {
+        // Check if SMTP is configured before attempting to send
+        if (!$this->isConfigured()) {
+            throw new WP_Mail_Master_Exception(
+                'SMTP is not configured. Please configure SMTP settings before sending emails.',
+                WP_Mail_Master_Exception::INVALID_CONFIG_ERROR
+            );
+        }
+
+        // Validate config before attempting to send
+        $this->validateSMTPConfig();
+
         try {
             // Validate email address
             if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {

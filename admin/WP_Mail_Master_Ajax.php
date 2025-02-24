@@ -24,7 +24,7 @@ class WP_Mail_Master_Ajax
     {
         try {
             // Verify nonce
-            if (!check_ajax_referer('send_test_email_nonce', 'nonce', false)) {
+            if (!check_ajax_referer('wp_mail_master_nonce', 'nonce', false)) {
                 throw new \Exception(__('Security check failed.', 'wp-mail-master'));
             }
 
