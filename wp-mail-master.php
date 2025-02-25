@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP Mail Master
- * Plugin URI: https://www.linkedin.com/in/martho/
+ * Plugin URI: https://wordpress.org/plugins/wp-mail-master/
  * Description: A fully featured email plugin for WordPress with API and SMTP support, email logging, and more.
  * Version: 1.1.0
  * Author: Martho
